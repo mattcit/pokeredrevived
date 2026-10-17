@@ -179,7 +179,8 @@ TryingToLearn:
 	pop bc
 	pop de
 	ld a, d
-	jr c, .hm
+	;mc allow HM moves to be forgotten
+	;jr c, .hm
 	pop hl
 	add hl, bc
 	and a

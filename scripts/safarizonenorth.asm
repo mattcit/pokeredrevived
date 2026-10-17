@@ -4,6 +4,7 @@ SafariZoneNorthScript:
 SafariZoneNorthTextPointers:
 	dw PickUpItemText
 	dw PickUpItemText
+	dw PickUpItemText
 	dw SafariZoneNorthText3
 	dw SafariZoneNorthText4
 	dw SafariZoneNorthText5

@@ -6,15 +6,15 @@ db 80 ; base speed
 db 100 ; base special
 db GHOST ; species type 1
 db POISON ; species type 2
-db 190 ; catch rate
+db 50 ; catch rate
 db 95 ; base exp yield
 INCBIN GASTLY_FR,0,1 ; 77, sprite dimensions
 dw GastlyPicFront
 dw GastlyPicBack
 ; attacks known at lvl 0
-db LICK
-db CONFUSE_RAY
-db NIGHT_SHADE
+db 0
+db 0
+db 0
 db 0
 db 3 ; growth rate
 ; learnset
@@ -22,7 +22,7 @@ db 3 ; growth rate
 	tmlearn 0
 	tmlearn 20,21,24
 	tmlearn 25,29,31,32
-	tmlearn 34,36
+	tmlearn 34,35,36
 	tmlearn 42,44,46,47
 	tmlearn 50
 ;	db 0 ; padding

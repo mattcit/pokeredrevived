@@ -6,6 +6,8 @@ ResidualEffects1:
 	db CONVERSION_EFFECT
 	db HAZE_EFFECT
 	db SWITCH_AND_TELEPORT_EFFECT
+	db ROAR_EFFECT
+	db WHIRLWIND_EFFECT
 	db MIST_EFFECT
 	db FOCUS_ENERGY_EFFECT
 	db CONFUSION_EFFECT
@@ -1231,12 +1233,40 @@ TrainerBattleVictory:
 	call DelayFrames
 	call PrintEndBattleText
 ; win money
+; Master difficulty: halve wAmountMoneyWon before display and wallet add
+	ld a, [wDifficultyLevel]
+	cp DIFF_MASTER
+	call z, .halvePrizeMoney
 	ld hl, MoneyForWinningText
 	call PrintText
 	ld de, wPlayerMoney + 2
 	ld hl, wAmountMoneyWon + 2
 	ld c, $3
 	predef_jump AddBCDPredef
+
+.halvePrizeMoney
+; Halve wAmountMoneyWon using the existing DivideBCD routine.
+; DivideBCD uses hMoney as dividend and hDivideBCDDivisor as divisor.
+; Result is written to hDivideBCDQuotient (same address as hDivideBCDDivisor).
+	ld a, [wAmountMoneyWon]
+	ld [hMoney], a
+	ld a, [wAmountMoneyWon + 1]
+	ld [hMoney + 1], a
+	ld a, [wAmountMoneyWon + 2]
+	ld [hMoney + 2], a
+	xor a
+	ld [hDivideBCDDivisor], a
+	ld [hDivideBCDDivisor + 1], a
+	ld a, $02
+	ld [hDivideBCDDivisor + 2], a
+	predef DivideBCDPredef
+	ld a, [hDivideBCDQuotient]
+	ld [wAmountMoneyWon], a
+	ld a, [hDivideBCDQuotient + 1]
+	ld [wAmountMoneyWon + 1], a
+	ld a, [hDivideBCDQuotient + 2]
+	ld [wAmountMoneyWon + 2], a
+	ret
 
 MoneyForWinningText:
 	TX_FAR _MoneyForWinningText
@@ -1727,6 +1757,17 @@ EnemySendOutFirstMon:
 	call GBPalNormal
 	ld hl, TrainerSentOutText
 	call PrintText
+
+	; ------------------------------------------------------------
+	; DEBUG: if wd732 bit 1 is set, show enemy mon stats/exp/DVs
+	; ------------------------------------------------------------
+	ld a, [wd732]
+	bit 1, a
+	jr z, .skipEnemySendOutDebug
+	ld hl, EnemySendOutDebugText
+	call PrintText
+.skipEnemySendOutDebug
+
 	ld a, [wEnemyMonSpecies2]
 	ld [wcf91], a
 	ld [wd0b5], a
@@ -1768,6 +1809,18 @@ TrainerAboutToUseText:
 TrainerSentOutText:
 	TX_FAR _TrainerSentOutText
 	db "@"
+
+EnemySendOutDebugText:
+	text " "        ; must print at least one real char
+	line "@"
+	TX_ASM
+	callba EnemySendOut_PrintDebugLines
+	call WaitForTextScrollButtonPress
+	jp TextScriptEnd
+
+; Reserve 1 byte somewhere in WRAM you already use for temp, or reuse an existing one.
+wTempByteValue: ds 1
+
 
 ; tests if the player has any pokemon that are not fainted
 ; sets d = 0 if all fainted, d != 0 if some mons are still alive
@@ -6860,7 +6913,8 @@ CheckEnemyStatusConditions:
 	ld hl, wEnemyBattleStatus1
 	ld a, [hl]
 	; clear bide, thrashing about, charging up, and multi-turn moves such as warp
-	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << USING_TRAPPING_MOVE))
+	;claude: also clear invulnerability (fly/dig) to prevent invincibility glitch, matching the player-side fix (ADP-31)
+	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << INVULNERABLE) | (1 << USING_TRAPPING_MOVE))
 	ld [hl], a
 	ld a, [wEnemyMoveEffect]
 	cp FLY_EFFECT
@@ -7027,43 +7081,49 @@ LoadEnemyMonData:
 	ld a, [wIsInBattle]
 	cp $2 ; is it a trainer battle?
 	jr nz, .nottrainer	;if not a trainer then skip this part
-;joenote - load default DVs if using "hard" battle style
-	ld a, [wOptions]	;load game options
-	bit BIT_BATTLE_HARD, a			;check battle style
-; fixed DVs for trainer mon
-	ld a, $98
-	ld b, $88
-	jr z, .storeDVs	;joenote - store the fixed DVs if not hard mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;joenote - going to randomly determine trainer DVs (values of 8 to 15)
-;load whatever default DVs are already there for the pkmn
-	ld hl, wEnemyMon1DVs
-	ld a, [wWhichPokemon]
-	ld bc, wEnemyMon2 - wEnemyMon1
-	call AddNTimes
-	ld a, [hl]
-	inc hl
-	ld b, [hl]
-	dec hl
-;lets see if it's been sent out before
-	push bc
-	ld c, a
-	
-	
-	push bc
-	push hl
-	callba CheckAISentOut
-	pop hl
-	pop bc
-	
-	ld a, c
-	pop bc
-	jr nz, .storeDVs	;if bit for that pkmn position is already set, then store its DVs that were just loaded
-;not sent out before, so generate special random DVs
-	call Random_BiasDV
-	;save DVs to the party data structure, to which hl is still pointing, so that they can be recalled on a switch-in
-	ld [hli], a
-	ld [hl], b
-	dec hl
+;mc assign static DVs based on difficulty level and boss status
+	call IsBossTrainer          ; carry set if current opponent is a boss trainer
+	jr c, .trainerIsBoss
+	; non-boss trainer DVs
+	ld a, [wDifficultyLevel]
+	cp DIFF_MASTER
+	jr z, .masterNonBoss
+	cp DIFF_ADVANCED
+	jr z, .advancedNonBoss
+	; DIFF_NORMAL non-boss: 5/4/5/4, avg 5.5, HP DV 5
+	ld a, $54
+	ld b, $54
+	jr .storeDVs
+.advancedNonBoss
+	; DIFF_ADVANCED non-boss: 7/6/6/6, avg 7.25, HP DV 7
+	ld a, $76
+	ld b, $66
+	jr .storeDVs
+.masterNonBoss
+	; DIFF_MASTER non-boss: 8/9/8/9, avg 9.5, HP DV 10
+	ld a, $89
+	ld b, $89
+	jr .storeDVs
+.trainerIsBoss
+	; boss trainer DVs
+	ld a, [wDifficultyLevel]
+	cp DIFF_MASTER
+	jr z, .masterBoss
+	cp DIFF_ADVANCED
+	jr z, .advancedBoss
+	; DIFF_NORMAL boss: 5/6/5/6, avg 6.5, HP DV 6
+	ld a, $56
+	ld b, $56
+	jr .storeDVs
+.advancedBoss
+	; DIFF_ADVANCED boss: 11/10/11/10, avg 9.0, HP DV 9
+	ld a, $BA
+	ld b, $BA
+	jr .storeDVs
+.masterBoss
+	; DIFF_MASTER boss: 11/11/12/12, avg 11.5, HP DV 12
+	ld a, $BB
+	ld b, $CC
 	jr .storeDVs
 .nottrainer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -7112,6 +7172,17 @@ LoadEnemyMonData:
 	ld a, l
 	ld [wUnusedD153 + 1], a
 	
+;mc need to sync static DVs from battle struct into this party slot
+;CalcStat reads party data DVs for trainer battles (not wEnemyMonDVs), so they must match
+	push hl
+	ld bc, wPartyMon1DVs - (wPartyMon1HPExp - 1)	; offset from HPExp-1 base to DVs field
+	add hl, bc	; hl now points to wEnemyMon<x>DVs for the correct party slot
+	ld a, [wEnemyMonDVs]
+	ld [hli], a
+	ld a, [wEnemyMonDVs + 1]
+	ld [hl], a
+	pop hl
+
 ;has this pkmn been sent out before? If so, then it already has statExp values
 	push hl
 	callba CheckAISentOut
@@ -7534,16 +7605,7 @@ ApplyBadgeStatBoosts:
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
 	jr z, .return ; return if link battle
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a, [wOptions]	;load game options
-	bit BIT_BATTLE_HARD, a			;check for hard mode
-	jr z, .dobadgeboost	;if not hard mode, always apply badge boosts
-;joenote - only apply badge stat boosts in wild battles to keep parity with ai trainers
-	ld a, [wIsInBattle]
-	cp $1 ; is it a wild battle?
-	jr nz, .return ; return if not wild
-.dobadgeboost
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;mc removed joe's hard mode badge boost adjustment
 	ld a, [wObtainedBadges]
 	ld b, a
 	call .selectiveBadgeBoost	;joenote - jump down and run new section
@@ -8049,7 +8111,12 @@ LoadMonBackPic:
 	call UncompressMonSprite
 
 ;joenote - needed for loading the 48x48 spaceworld back sprites
-IF DEF(_SWBACKS)
+;claude: split off from the shared _SWBACKS flag so this only affects the general
+;claude: Pokemon back-sprite site -- Red's and the Old Man's own back sprites
+;claude: (LoadPlayerBackPic and the Hall of Fame ceremony) intentionally still use
+;claude: the original _SWBACKS-gated branches, untouched, and stay on the old
+;claude: scale-by-2-and-interlace path since _SWBACKS itself is never defined
+IF DEF(_SWMONBACKS)
 	callba LoadUncompressedBackPics
 ELSE
 	call SpriteScalingAndInterlacing
@@ -8158,8 +8225,8 @@ MoveEffectPointerTable:
 	 dw StatModifierDownEffect    ; SPEED_DOWN_SIDE_EFFECT
 	 dw StatModifierDownEffect    ; SPECIAL_DOWN_SIDE_EFFECT
 	 dw StatModifierDownEffect    ; ACCURACY_DOWN_SIDE_EFFECT
-	 dw StatModifierDownEffect    ; unused effect
-	 dw StatModifierDownEffect    ; unused effect
+	 dw SwitchAndTeleportEffect   ; ROAR_EFFECT (dispatches on the move number, like Teleport)
+	 dw SwitchAndTeleportEffect   ; WHIRLWIND_EFFECT
 	 dw StatModifierDownEffect    ; unused effect
 	 dw ConfusionSideEffect       ; CONFUSION_SIDE_EFFECT
 	 dw TwoToFiveAttacksEffect    ; TWINEEDLE_EFFECT
@@ -8761,7 +8828,12 @@ StatModifierDownEffect:
 	jr c, .notFlash
 	; load ACCURACY_DOWN_SIDE_EFFECT as the move effect so accuracy will be lowered
 	ld a, ACCURACY_DOWN_SIDE_EFFECT
-	ld [wPlayerMoveEffect], a
+	;claude: write to [de] (the move-effect var selected above for whoever's turn it is),
+	;claude: not always wPlayerMoveEffect -- the hardcoded write here only matched [de] by
+	;claude: coincidence on the player's turn; on the enemy's turn de=wEnemyMoveEffect, so
+	;claude: wEnemyMoveEffect was left holding FLASH_EFFECT, corrupting the stat-index math
+	;claude: a few lines down and glitching the stat-name text (see ENG-3 flash text-glitch report)
+	ld [de], a
 	jr .skipFailCheck
 .notFlash
 	cp ATTACK_DOWN_SIDE_EFFECT
@@ -9052,93 +9124,24 @@ ThrashPetalDanceEffect:
 	add ANIM_B0
 	jp PlayBattleAnimation2
 
+;claude: Teleport/Roar/Whirlwind. Wild battle: the battle just ends, always -- the old
+;claude: level-based escape roll is gone, so these moves can no longer fail there. Trainer
+;claude: battle: Teleport switches the user out, Roar/Whirlwind make the target switch
+;claude: (all in TeleportSwitch, custom_functions/func_switch_moves.asm, via TeleportSwitchEntry).
 SwitchAndTeleportEffect:
+	ld a, [wIsInBattle]
+	dec a
+	jr nz, TeleportSwitchEntry ; trainer battle
+	call ReadPlayerMonCurHPAndStatus
+	xor a
+	ld [wAnimationType], a
+	inc a
+	ld [wEscapedFromBattle], a
 	ld a, [H_WHOSETURN]
 	and a
-	jr nz, .handleEnemy
-	ld a, [wIsInBattle]
-	dec a
-	jr nz, .notWildBattle1
-	ld a, [wCurEnemyLVL]
-	ld b, a
-	ld a, [wBattleMonLevel]
-	cp b ; is the player's level greater than the enemy's level?
-	jr nc, .playerMoveWasSuccessful ; if so, teleport will always succeed
-	add b
-	ld c, a
-	inc c ; c = sum of player level and enemy level
-.rejectionSampleLoop1
-	call BattleRandom
-	cp c ; get a random number between 0 and c
-	jr nc, .rejectionSampleLoop1
-	srl b
-	srl b  ; b = enemyLevel / 4
-	cp b ; is rand[0, playerLevel + enemyLevel) >= (enemyLevel / 4)?
-	jr nc, .playerMoveWasSuccessful ; if so, allow teleporting
-	ld c, 50
-	call DelayFrames
 	ld a, [wPlayerMoveNum]
-	cp TELEPORT
-	jp nz, PrintDidntAffectText
-	jp PrintButItFailedText_
-.playerMoveWasSuccessful
-	call ReadPlayerMonCurHPAndStatus
-	xor a
-	ld [wAnimationType], a
-	inc a
-	ld [wEscapedFromBattle], a
-	ld a, [wPlayerMoveNum]
-	jr .playAnimAndPrintText
-.notWildBattle1
-	ld c, 50
-	call DelayFrames
-	ld hl, IsUnaffectedText
-	ld a, [wPlayerMoveNum]
-	cp TELEPORT
-	jp nz, PrintText
-	jp PrintButItFailedText_
-.handleEnemy
-	ld a, [wIsInBattle]
-	dec a
-	jr nz, .notWildBattle2
-	ld a, [wBattleMonLevel]
-	ld b, a
-	ld a, [wCurEnemyLVL]
-	cp b
-	jr nc, .enemyMoveWasSuccessful
-	add b
-	ld c, a
-	inc c
-.rejectionSampleLoop2
-	call BattleRandom
-	cp c
-	jr nc, .rejectionSampleLoop2
-	srl b
-	srl b
-	cp b
-	jr nc, .enemyMoveWasSuccessful
-	ld c, 50
-	call DelayFrames
+	jr z, .playAnimAndPrintText
 	ld a, [wEnemyMoveNum]
-	cp TELEPORT
-	jp nz, PrintDidntAffectText
-	jp PrintButItFailedText_
-.enemyMoveWasSuccessful
-	call ReadPlayerMonCurHPAndStatus
-	xor a
-	ld [wAnimationType], a
-	inc a
-	ld [wEscapedFromBattle], a
-	ld a, [wEnemyMoveNum]
-	jr .playAnimAndPrintText
-.notWildBattle2
-	ld c, 50
-	call DelayFrames
-	ld hl, IsUnaffectedText
-	ld a, [wEnemyMoveNum]
-	cp TELEPORT
-	jp nz, PrintText
-	jp ConditionalPrintButItFailed
 .playAnimAndPrintText
 	push af
 	call PlayBattleAnimation
@@ -9166,6 +9169,15 @@ RanAwayScaredText:
 WasBlownAwayText:
 	TX_FAR _WasBlownAwayText
 	db "@"
+
+;claude: Trainer-battle Teleport/Roar/Whirlwind: the logic (TeleportSwitch) lives in bank $2E,
+;claude: custom_functions/func_switch_moves.asm, because this bank has no room left; this is
+;claude: just the shared entry stub. Roar and Whirlwind are high priority and Teleport is low
+;claude: priority in trainer battles (see func_battle.asm).
+;claude: (LQOL-7's old "Can't escape!" Teleport failure text and its PrintCantEscapeText
+;claude: helper were removed: Teleport no longer has that failure.)
+TeleportSwitchEntry:
+	jpab TeleportSwitch
 
 TwoToFiveAttacksEffect:
 	ld hl, wPlayerBattleStatus1
@@ -9404,7 +9416,12 @@ ConfusionSideEffectSuccess:
 	ld a, [wEnemyMoveEffect]
 .confuseTarget
 	bit CONFUSED, [hl] ; is mon confused?
-	jr nz, ConfusionEffectFailed
+	;claude: this is the one place we know for certain *why* the confuse attempt failed
+	;claude: (target already confused) -- LQOL-5: give it its own text instead of falling
+	;claude: through to the generic ConfusionEffectFailed/"But, it failed!" path below,
+	;claude: which is also reached by unrelated failures (blocked by Substitute, plain miss)
+	;claude: that should keep saying "But, it failed!"
+	jr nz, TargetAlreadyConfused
 	set CONFUSED, [hl] ; mon is now confused
 	push af
 	call BattleRandom
@@ -9426,9 +9443,32 @@ BecameConfusedText:
 	TX_FAR _BecameConfusedText
 	db "@"
 
+;claude: LQOL-5 -- target is already confused, so the confuse half of this move's effect
+;claude: had no effect. Mirrors ConditionalPrintButItFailed's own gate (skip the message if
+;claude: the move's main attack already connected -- e.g. Psybeam/Confusion/Dizzy Punch's
+;claude: secondary confuse chance succeeding its roll but finding the target pre-confused;
+;claude: that stays silent, same as it always has, since damage was already dealt), but
+;claude: always prints for status moves whose whole point is the confuse (Confuse Ray,
+;claude: Supersonic, Flash), matching the maintainer's 2026-09-08 ruling.
+TargetAlreadyConfused:
+	ld a, [wMoveDidntMiss]
+	and a
+	ret nz ; return if the side effect failed, yet the attack was successful
+	ld c, 50
+	call DelayFrames
+	ld hl, TargetAlreadyConfusedText
+	jp PrintText
+
+TargetAlreadyConfusedText:
+	TX_FAR _TargetAlreadyConfusedText
+	db "@"
+
+;claude: ConfusionEffectFailed is now only reached for the substitute-blocked and
+;claude: plain-miss cases (see ConfusionEffect/FlashEffect's own jumps below) -- the
+;claude: already-confused case above no longer funnels through here, so the old
+;claude: "cp CONFUSION_SIDE_EFFECT / ret z" suppression that used to intercept Flash's
+;claude: already-confused case here is dead code post-fix and has been removed.
 ConfusionEffectFailed:
-	cp CONFUSION_SIDE_EFFECT
-	ret z
 	ld c, 50
 	call DelayFrames
 	jp ConditionalPrintButItFailed
@@ -9580,7 +9620,11 @@ DisableEffect:
 ; no effect if target already has a move disabled
 	ld a, [de]
 	and a
-	jr nz, .moveMissed
+	;claude: LQOL-6 -- this is the one point that knows for certain *why* Disable is about
+	;claude: to fail (target already has a disabled move); redirect just this jump to its
+	;claude: own text instead of the shared .moveMissed/"But, it failed!" path below, which
+	;claude: stays for Disable's plain-miss and no-PP-anywhere cases
+	jr nz, .targetMoveAlreadyDisabled
 .pickMoveToDisable
 	push hl		;preserve wBattleMonMoves/wEnemyMonMoves
 	call BattleRandom
@@ -9652,9 +9696,16 @@ DisableEffect:
 	pop hl
 .moveMissed
 	jp PrintButItFailedText_
+.targetMoveAlreadyDisabled
+	ld hl, TargetMoveAlreadyDisabledText
+	jp PrintText
 
 MoveWasDisabledText:
 	TX_FAR _MoveWasDisabledText
+	db "@"
+
+TargetMoveAlreadyDisabledText:
+	TX_FAR _TargetMoveAlreadyDisabledText
 	db "@"
 
 ;mc custom move effect for FLASH (lower accuracy and confusion)
@@ -9689,7 +9740,17 @@ FlashEffect:
 	; change the current move effect to CONFUSION_SIDE_EFFECT before calling the confusion routine
 	; --this will skip displaying "but it failed" if enemy is already confused
 	ld a, CONFUSION_SIDE_EFFECT
-	ld [wPlayerMoveEffect], a
+	;claude: write to [de], not always wPlayerMoveEffect -- de still holds the per-turn
+	;claude: move-effect pointer StatModifierDownEffect set up (it preserves de across its
+	;claude: own body and restores it right before its ret), so this is the same fix already
+	;claude: applied inside StatModifierDownEffect itself, just for this second hardcoded
+	;claude: write. On the enemy's turn the old hardcoded write left wEnemyMoveEffect holding
+	;claude: ACCURACY_DOWN_SIDE_EFFECT (from StatModifierDownEffect) instead of
+	;claude: CONFUSION_SIDE_EFFECT, so ConfusionSideEffectSuccess's FLASH_EFFECT/
+	;claude: CONFUSION_SIDE_EFFECT animation-skip check (core.asm ~9487-9490) failed to
+	;claude: recognize this as Flash and called PlayCurrentMoveAnimation2 a second time
+	;claude: (see ENG-3 flash text-glitch report for the sibling instance of this bug shape)
+	ld [de], a
 	; now trigger confusion
 	call ConfusionSideEffectSuccess
 	ret

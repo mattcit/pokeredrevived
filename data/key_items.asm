@@ -61,13 +61,13 @@ KeyItemBitfield:
 	TRUE,  \ ; DOME_FOSSIL
 	TRUE,  \ ; HELIX_FOSSIL
 	TRUE,  \ ; SECRET_KEY
-	TRUE,  \ ; UNUSED_ITEM
+	TRUE,  \ ; GOLD_WATCH ;mc added GOLD WATCH for game warden reward
 	TRUE,  \ ; BIKE_VOUCHER
 	FALSE, \ ; X_ACCURACY
 	FALSE, \ ; LEAF_STONE
 	TRUE,  \ ; CARD_KEY
 	FALSE, \ ; NUGGET
-	FALSE, \ ; PP_UP_2
+	TRUE, \  ; CHANGE_DIFF ;mc added debug "change difficulty" level item
 	FALSE, \ ; POKE_DOLL
 	FALSE, \ ; FULL_HEAL
 	FALSE, \ ; REVIVE
@@ -100,4 +100,5 @@ KeyItemBitfield:
 	FALSE, \ ; ETHER
 	FALSE, \ ; MAX_ETHER
 	FALSE, \ ; ELIXER
-	FALSE    ; MAX_ELIXER
+	FALSE, \ ; MAX_ELIXER
+	TRUE     ; DBG_STATXP

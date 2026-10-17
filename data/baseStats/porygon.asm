@@ -12,9 +12,9 @@ INCBIN PORYGON_FR,0,1 ; 66, sprite dimensions
 dw PorygonPicFront
 dw PorygonPicBack
 ; attacks known at lvl 0
-db TACKLE
-db SHARPEN
-db CONVERSION
+db 0
+db 0
+db 0
 db 0
 db 0 ; growth rate
 ; learnset
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 9,10,13,14,15
 	tmlearn 20,24
 	tmlearn 25,29,30,31,32
-	tmlearn 33,34,39,40
+	tmlearn 33,34,35,39,40
 	tmlearn 44,45,46
 	tmlearn 49,50,55
 ;	db 0 ; padding

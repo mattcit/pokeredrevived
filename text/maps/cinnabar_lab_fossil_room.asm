@@ -1,26 +1,30 @@
 _Lab4Text_75dc6::
-	text "Hiya!"
+	text "Hi there!"
 
-	para "I am important"
-	line "doctor!"
+	para "I have designed"
+	line "this machine here"
+	cont "to take any"
+	cont "#MON fossil"
+	cont "and bring that"
+	cont "#MON back to"
+	cont "life again!"
 
-	para "I study here rare"
-	line "#MON fossils!"
-
-	para "You! Have you a"
-	line "fossil for me?"
+	para "Do you have you a"
+	line "fossil that you'd"
+	cont "like to revive?"
 	prompt
 
 _Lab4Text_75dcb::
-	text "No! Is too bad!"
+	text "No? Well that's"
+	line "too bad!"
 	done
 
 _Lab4Text_75dd0::
-	text "I take a little"
-	line "time!"
+	text "This will take a"
+	line "little time."
 
-	para "You go for walk a"
-	line "little while!"
+	para "How about you go"
+	line "for a quick walk?"
 	done
 
 _Lab4Text_75dd5::
@@ -32,7 +36,7 @@ _Lab4Text_75dd5::
 	para "It was @"
 	TX_RAM wcf4b
 	db $0
-	line "like I think!"
+	line "like I thought!"
 	prompt
 
 _Lab4Text_610ae::
@@ -41,7 +45,7 @@ _Lab4Text_610ae::
 	TX_RAM wcd6d
 	text "!"
 
-	para "It is fossil of"
+	para "It is a fossil of"
 	line "@"
 	TX_RAM wcf4b
 	text ", a"
@@ -55,8 +59,9 @@ _Lab4Text_610ae::
 	done
 
 _Lab4Text_610b3::
-	text "So! You hurry and"
-	line "give me that!"
+	text "If you give me"
+	line "the fossil we can"
+	cont "get started now!"
 
 	para "<PLAYER> handed"
 	line "over @"
@@ -65,14 +70,15 @@ _Lab4Text_610b3::
 	prompt
 
 _Lab4Text_610b8::
-	text "I take a little"
-	line "time!"
+	text "This will take a"
+	line "little time."
 
-	para "You go for walk a"
-	line "little while!"
+	para "How about you go"
+	line "for a quick walk?"
 	done
 
 _Lab4Text_610bd::
-	text "Aiyah! You come"
-	line "again!"
+	text "If you change your"
+	line "mind feel free to"
+	cont "come back later!"
 	done

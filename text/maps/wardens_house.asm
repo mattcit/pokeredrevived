@@ -46,6 +46,7 @@ _ReceivedHM04Text::
 	line "@"
 	TX_RAM wcf4b
 	text "!@@"
+	prompt
 
 _HM04ExplanationText::
 	text "WARDEN: HM04"
@@ -61,15 +62,48 @@ _HM04ExplanationText::
 	cont "in SAFARI ZONE?"
 
 	para "If you do, you"
-	line "win an HM!"
+	line "win another HM!"
 
 	para "I hear it's the"
 	line "rare SURF HM."
+
+	para "Also, I still have"
+	line "another item that"
+	cont "is lost in the"
+	cont "SAFARI ZONE."
+
+	para "If you can find my"
+	line "GOLD WATCH, I"
+	cont "could give you a"
+	cont "RARE #MON."
 	done
 
 _HM04NoRoomText::
 	text "Your pack is"
 	line "stuffed full!"
+	done
+
+_WardenWatchThankYouText::
+	text "Oh, you found"
+	line "my GOLD WATCH!"
+
+	para "It may not be"
+	line "worth much, but"
+	cont "it has a lot of"
+	cont "sentimental value"
+	cont "to me."
+
+	para "As a reward I"
+	line "want to give you"
+	cont "one of my RARE"
+	cont "#MON. Please"
+	cont "take good care"
+	cont "of it for me!"
+	prompt
+
+_WardenFinalText::
+	text "Take good care of"
+	line "that #MON!"
 	done
 
 _FuchsiaHouse2Text_75176::

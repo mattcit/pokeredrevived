@@ -13,10 +13,10 @@ INCBIN "pic/other/missingno.pic",0,1 ; $77, sprite dimensions
 dw MissingnoPic
 dw OldManPic	;use old man for back pic as a placeholder
 ; attacks known at lvl 0
-db WATER_GUN
-db SKY_ATTACK
-db BIND
-db PAY_DAY
+db 0
+db 0
+db 0
+db 0
 db 3 ; growth rate
 ; learnset
 	tmlearn 1,2,3,4,5,6,7,8

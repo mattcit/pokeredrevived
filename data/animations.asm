@@ -165,13 +165,17 @@ AttackAnimationPointers:
 	dw SubstituteAnim
 	;mc add new moves
 	dw BugBiteAnim
+	dw BugBuzzAnim
 	dw CrossChopAnim
 	dw DragonBreathAnim
 	dw IcyWindAnim
+	dw MudShotAnim
 	dw MudSlapAnim
 	dw ShadowBallAnim
 	dw SparkAnim
 	dw StoneEdgeAnim
+	dw XScissorAnim
+	dw FlameWheelAnim
 	dw StruggleAnim
 	dw ShowPicAnim
 	dw EnemyFlashAnim
@@ -227,6 +231,7 @@ StruggleAnim:
 	db $08,$00,$01
 	db $FF
 
+MudShotAnim:
 MudSlapAnim:
 CrossChopAnim:
 KarateChopAnim:
@@ -291,6 +296,7 @@ SwordsDanceAnim:
 	db $46,$0D,$18
 	db $FF
 
+XScissorAnim:
 CutAnim:
 	db SE_DARK_SCREEN_FLASH, $0E
 	db $04,$FF,$16
@@ -446,6 +452,7 @@ LeerAnim:
 	db $FF
 
 BugBiteAnim:
+BugBuzzAnim:
 BiteAnim:
 	db $08,$2B,$02
 	db $FF
@@ -928,6 +935,7 @@ BoneClubAnim:
 	db $08,$7C,$02
 	db $FF
 
+FlameWheelAnim:
 FireBlastAnim:
 	db $46,$7D,$1F
 	db $46,$FF,$20

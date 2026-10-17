@@ -12,7 +12,7 @@ INCBIN DIGLETT_FR,0,1 ; 55, sprite dimensions
 dw DiglettPicFront
 dw DiglettPicBack
 ; attacks known at lvl 0
-db SCRATCH
+db 0
 db 0
 db 0
 db 0
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 9,10
 	tmlearn 20
 	tmlearn 26,27,28,31,32
-	tmlearn 34
+	tmlearn 34,37
 	tmlearn 44,48
 	tmlearn 50
 ;	db 0 ; padding

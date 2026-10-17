@@ -70,7 +70,7 @@ _CeruleanCityText_196d9::
 
 _ReceivedTM28Text::
 	text "<PLAYER> recovered"
-	line "TM28!@@"
+	line "TM37!@@"
 
 _ReceivedTM28Text2::
 	db $0

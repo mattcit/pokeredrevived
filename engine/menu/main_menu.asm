@@ -201,7 +201,7 @@ MainMenu:
 	ld a, [wNumHoFTeams]
 	and a
 	jr z, .noHoF
-	SetEvent EVENT_908	;if the elite 4 have been beaten, set the event flag for it
+	SetEvent EVENT_DEFEATED_ELITE_FOUR	;if the elite 4 have been beaten, set the event flag for it
 .noHoF
 	xor a
 	ld [wDestinationMap], a
@@ -433,7 +433,7 @@ HandshakeList:	;this serves as a version control passcode with FF as an end-of-l
 	db $b
 	db $ff
 VersionText:
-	db "v1.24.5L@"
+	db "v0.0.0-alpha@"
 
 WhereWouldYouLikeText:
 	TX_FAR _WhereWouldYouLikeText
@@ -474,6 +474,83 @@ SpecialEnterMap:
 	and a
 	ret nz
 	jp EnterMap
+
+;mc add new select difficulty menu
+SelectDifficultyOnNewGame:
+	call ClearScreen
+	call LoadTextBoxTilePatterns
+
+	; Bottom text box
+	coord hl, 0, 12
+	ld b, 4
+	ld c, 18
+	call TextBoxBorder
+	coord hl, 1, 14
+	ld de, DifficultyPromptText
+	call PlaceString
+
+	; Top-left selection menu
+	ld de, DifficultyMenuList
+	call DisplayIntroDifficultyMenu
+
+	; store selection (0/1/2)
+	ld a, [wCurrentMenuItem]
+	ld [wDifficultyLevel], a
+
+	; force SET mode for Advanced/Master; SHIFT is already default (InitOptions zeroed bit 6)
+	and a                       ; DIFF_NORMAL = 0, sets Z flag
+	jr z, .difficultySelected   ; Normal: leave SHIFT mode as-is
+	ld a, [wOptions]
+	set BIT_BATTLE_SHIFT, a     ; Advanced or Master: force SET mode
+	ld [wOptions], a
+.difficultySelected
+
+	call ClearScreen
+	ret
+
+DisplayIntroDifficultyMenu:
+	push de
+
+	; Draw same size box as name select
+	coord hl, 0, 0
+	ld b, 7
+	ld c, 14
+	call TextBoxBorder
+
+	pop de
+	coord hl, 2, 2
+	call PlaceString
+
+	call UpdateSprites
+
+	xor a
+	ld [wCurrentMenuItem], a
+	ld [wLastMenuItem], a
+
+	inc a
+	ld [wTopMenuItemX], a
+	ld [wMenuWatchedKeys], a ; A_BUTTON only
+
+	inc a
+	ld [wTopMenuItemY], a
+
+	ld a, 2              ; 3 options → max index = 2
+	ld [wMaxMenuItem], a
+
+	jp HandleMenuInput
+
+DifficultyPromptText:
+	db "How skilled of a"
+	next "Trainer are you?@"
+
+DifficultyMenuList:
+;claude: AST-2 follow-up: the sparkle glyph moved from font.png tile $69 to tile $41
+;claude: (see start_sub_menus.asm's TrainerInfo_DrawDifficultyStars) -- this list is a
+;claude: second, separate reference to the same glyph that was missed in that pass.
+	db   "NORMAL   ", $C1
+	next "ADVANCED ", $C1, $C1
+	next "MASTER   ", $C1, $C1, $C1
+	db "@"
 
 ContinueText:
 	db "CONTINUE", $4e
@@ -597,7 +674,12 @@ DisplayOptionMenu:
 	ld de, BattleAnimationOptionText
 	call PlaceString
 	coord hl, 1, 11
+	ld a, [wDifficultyLevel]
+	cp DIFF_NORMAL
 	ld de, BattleStyleOptionText
+	jr z, .placeBattleStyleText
+	ld de, BattleStyleOptionTextLocked  ; Advanced/Master: hide SHIFT option
+.placeBattleStyleText
 	call PlaceString
 	coord hl, 2, 16
 	ld de, OptionMenuCancelText
@@ -706,6 +788,15 @@ DisplayOptionMenu:
 	ld [wOptionsBattleAnimCursorX], a
 	jp .eraseOldMenuCursor
 .cursorInBattleStyle
+	; SET mode is mandatory on Advanced/Master - block toggling
+	ld a, [wDifficultyLevel]
+	cp DIFF_NORMAL
+	jr z, .battleStyleToggleAllowed
+	; not Normal: load current X position into A (unchanged, stays on SET)
+	ld a, [wOptionsBattleStyleCursorX]
+	jp .eraseOldMenuCursor
+.battleStyleToggleAllowed
+	; Normal difficulty: allow toggling freely
 	ld a, [wOptionsBattleStyleCursorX] ; battle style cursor X coordinate
 	xor $0b ; toggle between 1 and 10
 	ld [wOptionsBattleStyleCursorX], a
@@ -754,6 +845,10 @@ BattleAnimationOptionText:
 BattleStyleOptionText:
 	db   "BATTLE STYLE"
 	next " SHIFT    SET@"
+
+BattleStyleOptionTextLocked:
+	db   "BATTLE STYLE"
+	next "          SET@"  ; 10 spaces keep SET aligned to same column as normal text
 
 OptionMenuCancelText:
 	db "CANCEL@"

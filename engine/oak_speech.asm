@@ -46,6 +46,9 @@ OakSpeech:
 	ld a, HACK_VERSION
 	ld [wRomHackVersion], a
 	predef SingleCPUSpeed	;...deactivate 2x speed das it may cause visual bugs during Oak's speech
+
+;mc add new select difficulty menu
+	call SelectDifficultyOnNewGame
 	
 ;joenote - give option to play as a female trainer here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

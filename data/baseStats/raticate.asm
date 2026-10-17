@@ -12,9 +12,9 @@ INCBIN RATICATE_FR,0,1 ; 66, sprite dimensions
 dw RaticatePicFront
 dw RaticatePicBack
 ; attacks known at lvl 0
-db TACKLE
-db TAIL_WHIP
-db QUICK_ATTACK
+db 0
+db 0
+db 0
 db 0
 db 0 ; growth rate
 ; learnset
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 9,10,11,12,13,14,15
 	tmlearn 20,24
 	tmlearn 25,28,31,32
-	tmlearn 34,39,40
+	tmlearn 34,35,39,40
 	tmlearn 44
 	tmlearn 50
 ;	db 0 ; padding

@@ -30,7 +30,10 @@ ELSE
 	INCLUDE "constants/monfrontpic_constants.asm"
 ENDC
 
-IF DEF(_SWBACKS)
+;claude: uses _SWMONBACKS (not _SWBACKS) -- this table only covers the 151 Pokemon
+;claude: species back sprites, not Red's/Old Man's, so it's on its own flag; see the
+;claude: note at LoadMonBackPic in engine/battle/core.asm
+IF DEF(_SWMONBACKS)
 	INCLUDE "constants/monbackpic_constants_sw.asm"
 ELSE
 	INCLUDE "constants/monbackpic_constants.asm"
@@ -228,6 +231,18 @@ ELSE
 PlayerCharacterTitleGraphics:   INCBIN "gfx/player_title.2bpp"
 ENDC
 PlayerCharacterTitleGraphicsEnd:
+
+;claude: AST-3: moved here from bank1A, which no longer had room (widened from 10 to 12 tiles,
+;claude: +16 bytes, overflowed bank1A's tileset/blockset data by exactly that amount); this bank
+;claude: already holds the rest of the title-screen graphics, so it's a natural fit
+Version_GFX:
+IF (DEF(_RED) || DEF(_GREEN))
+	INCBIN "gfx/red/redgreenversion.1bpp" ; 12 tiles
+ENDC
+IF DEF(_BLUE)
+	INCBIN "gfx/blue/blueversion.1bpp" ; 8 tiles
+ENDC
+Version_GFXEnd:
 
 
 SECTION "Battle (bank 4)", ROMX, BANK[$4]
@@ -616,12 +631,13 @@ SECTION "Battle (bank C)", ROMX, BANK[$C]
 
 SECTION "Battle (bank D)", ROMX, BANK[$D]
 ;migrated content to bank 9
+INCLUDE "data/cries.asm"
 
 SECTION "bankE",ROMX,BANK[$E]
 
 INCLUDE "data/moves.asm"
 BaseStats: INCLUDE "data/base_stats.asm"
-INCLUDE "data/cries.asm"
+
 ;INCLUDE "engine/battle/unused_stats_functions.asm" ;joenote - putting this back into use and moving to bank 2d
 INCLUDE "engine/battle/scroll_draw_trainer_pic.asm"
 INCLUDE "engine/battle/trainer_ai.asm"
@@ -638,9 +654,7 @@ INCLUDE "engine/battle/draw_hud_pokeball_gfx.asm"
 ;TradingAnimationGraphics2End:
 
 INCLUDE "engine/evos_moves.asm"
-INCLUDE "engine/battle/moveEffects/heal_effect.asm"
-INCLUDE "engine/battle/moveEffects/transform_effect.asm"
-INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm"
+;mc moved the rest of the files in this bank to other banks to make space for the updated learnsets
 
 
 SECTION "bankF",ROMX,BANK[$F]
@@ -1223,6 +1237,10 @@ INCLUDE "engine/menu/diploma.asm"
 
 INCLUDE "engine/overworld/trainers.asm"
 
+INCLUDE "engine/battle/moveEffects/heal_effect.asm"
+INCLUDE "engine/battle/moveEffects/transform_effect.asm"
+INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm"
+
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -1635,15 +1653,6 @@ SECTION "bank1A",ROMX,BANK[$1A]
 
 INCLUDE "engine/battle/decrement_pp.asm"
 
-Version_GFX:
-IF (DEF(_RED) || DEF(_GREEN))
-	INCBIN "gfx/red/redgreenversion.1bpp" ; 10 tiles
-ENDC
-IF DEF(_BLUE)
-	INCBIN "gfx/blue/blueversion.1bpp" ; 8 tiles
-ENDC
-Version_GFXEnd:
-
 Dojo_GFX:
 Gym_GFX:           INCBIN "gfx/tilesets/gym.2bpp"
 Dojo_Block:
@@ -1910,10 +1919,7 @@ IF DEF(_FPLAYER)
 	RedFFishingTilesSide:  INCBIN "gfx/redF_fishing_tile_side.2bpp"
 ENDC
 
-INCLUDE "engine/items/tm_prices.asm"
-
-INCLUDE "engine/learn_move.asm"	;joenote - moved in order to have more space
-INCLUDE "engine/overworld/elevator.asm"	;joenote - moving this to make space
+;mc moved to bank 2e to make room for extra trainer parties/moves lists
 
 SECTION "bank2E",ROMX,BANK[$2E]	
 ;gbcnote - This bank will hold the bg map attributes for the gameboy color among other stuff
@@ -1927,6 +1933,7 @@ INCLUDE "engine/in_game_trades.asm"	;joenote - moved here to make space
 
 INCLUDE "custom_functions/func_gamma.asm"
 INCLUDE "custom_functions/func_extra_menu.asm"
+INCLUDE "custom_functions/func_switch_moves.asm"	;claude: Teleport/Roar/Whirlwind switching, see that file
 
 SECTION "Pics 1", ROMX, BANK[PICS_1]
 INCLUDE "constants/pic_banks/pic1.asm"
@@ -1959,3 +1966,145 @@ ENDC
 
 INCLUDE "text/tmhm_names.asm"	;joenote - adding name list for tm and hm items
 tmhmNamesEnd:
+
+;mc moved from bank 2d to make room for extra trainer parties/moves lists
+INCLUDE "engine/items/tm_prices.asm"
+INCLUDE "engine/learn_move.asm"	;joenote - moved in order to have more space
+INCLUDE "engine/overworld/elevator.asm"	;joenote - moving this to make space
+
+; ------------------------------------------------------------
+; EnemySendOut_PrintDebugLines
+; Prints 4 lines in the current textbox:
+; AT/DE/SD/SC with: Stat(3)  StatExp(6)  DV(2)
+; ------------------------------------------------------------
+EnemySendOut_PrintDebugLines:
+	; --- compute pointer to this enemy party mon's EXP/DVs ---
+	; We reuse AddNTimes with the party struct stride.
+	ld a, [wWhichPokemon]
+	ld bc, wEnemyMon2 - wEnemyMon1
+
+	; HL_ATKEXP = wEnemyMon1AttackExp + n*stride
+	ld hl, wEnemyMon1AttackExp
+	call AddNTimes
+	push hl              ; save ATK exp ptr
+
+	; HL_DEFEXP
+	ld a, [wWhichPokemon]
+	ld hl, wEnemyMon1DefenseExp
+	ld bc, wEnemyMon2 - wEnemyMon1
+	call AddNTimes
+	push hl              ; save DEF exp ptr
+
+	; HL_SPDexp
+	ld a, [wWhichPokemon]
+	ld hl, wEnemyMon1SpeedExp
+	ld bc, wEnemyMon2 - wEnemyMon1
+	call AddNTimes
+	push hl              ; save SPD exp ptr
+
+	; HL_SPCexp
+	ld a, [wWhichPokemon]
+	ld hl, wEnemyMon1SpecialExp
+	ld bc, wEnemyMon2 - wEnemyMon1
+	call AddNTimes
+	push hl              ; save SPC exp ptr
+
+	; ---- Line 1: AT ----
+	coord hl, 1, 13
+	ld de, EnemyDbg_ATPrefix
+	call PlaceString
+
+	; Stat value (ATK)
+	coord hl, 4, 13
+	ld de, wEnemyMonAttack
+	lb bc, LEADING_ZEROES | 2, 3
+	call PrintNumber
+
+	; StatExp (ATK)
+	coord hl, 8, 13
+	pop de               ; ATK exp ptr (LSB/MSB in memory as your struct defines)
+	lb bc, LEADING_ZEROES | 2, 6
+	call PrintNumber
+
+	; DV (ATK): high nibble of B
+	coord hl, 15, 13
+	ld a, [wEnemyMonDVs]
+	swap a
+	and $0F
+	call EnemyDbg_PrintNibble2
+
+	; ---- Line 2: DE ----
+	coord hl, 1, 14
+	ld de, EnemyDbg_DEPrefix
+	call PlaceString
+
+	coord hl, 4, 14
+	ld de, wEnemyMonDefense
+	lb bc, LEADING_ZEROES | 2, 3
+	call PrintNumber
+
+	coord hl, 8, 14
+	pop de               ; DEF exp ptr
+	lb bc, LEADING_ZEROES | 2, 6
+	call PrintNumber
+
+	coord hl, 15, 14
+	ld a, [wEnemyMonDVs]
+	and $0F
+	call EnemyDbg_PrintNibble2
+
+	; ---- Line 3: SD ----
+	coord hl, 1, 15
+	ld de, EnemyDbg_SDPrefix
+	call PlaceString
+
+	coord hl, 4, 15
+	ld de, wEnemyMonSpeed
+	lb bc, LEADING_ZEROES | 2, 3
+	call PrintNumber
+
+	coord hl, 8, 15
+	pop de               ; SPD exp ptr
+	lb bc, LEADING_ZEROES | 2, 6
+	call PrintNumber
+
+	coord hl, 15, 15
+	ld a, [wEnemyMonDVs + 1]
+	swap a
+	and $0F
+	call EnemyDbg_PrintNibble2
+
+	; ---- Line 4: SC ----
+	coord hl, 1, 16
+	ld de, EnemyDbg_SCPrefix
+	call PlaceString
+
+	coord hl, 4, 16
+	ld de, wEnemyMonSpecial
+	lb bc, LEADING_ZEROES | 2, 3
+	call PrintNumber
+
+	coord hl, 8, 16
+	pop de               ; SPC exp ptr
+	lb bc, LEADING_ZEROES | 2, 6
+	call PrintNumber
+
+	coord hl, 15, 16
+	ld a, [wEnemyMonDVs + 1]
+	and $0F
+	call EnemyDbg_PrintNibble2
+
+	; We pushed 4 EXP pointers; we popped 4 above. Good.
+	ret
+
+EnemyDbg_ATPrefix: db "AT @"
+EnemyDbg_DEPrefix: db "DE @"
+EnemyDbg_SDPrefix: db "SD @"
+EnemyDbg_SCPrefix: db "SC @"
+
+; A = 0..15
+EnemyDbg_PrintNibble2:
+	ld [wDbgPrintTemp], a	; use dedicated temp (wUnusedC000 holds battle flags in bit 1 etc.)
+	ld de, wDbgPrintTemp
+	lb bc, LEADING_ZEROES | 1, 2
+	jp PrintNumber

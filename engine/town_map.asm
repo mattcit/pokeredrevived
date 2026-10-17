@@ -165,10 +165,24 @@ LoadTownMap_Fly:
 	call LoadTownMap
 	call LoadPlayerSpriteGraphics
 	call LoadFontTilePatterns
+	ld a, [wd732]
+	bit 7, a
+	jr nz, .loadSlowbroSprite   ; if Teleport flag (bit 7) is set, load SlowbroSprite
+
+	; Normal Fly mode: load BirdSprite:
 	ld de, BirdSprite
 	ld hl, vSprites + $40
 	lb bc, BANK(BirdSprite), $c
 	call CopyVideoData
+	jp .afterSpriteLoad
+
+.loadSlowbroSprite
+	ld de, SlowbroSprite        ; new sprite for Teleport
+	ld hl, vSprites + $40
+	lb bc, BANK(SlowbroSprite), $c
+	call CopyVideoData
+
+.afterSpriteLoad
 	ld de, TownMapUpArrow
 	ld hl, vChars1 + $6d0
 	lb bc, BANK(TownMapUpArrow), (TownMapUpArrowEnd - TownMapUpArrow) / $8
@@ -258,8 +272,14 @@ ENDC
 	ld [wDestinationMap], a
 	ld hl, wd732
 	set 3, [hl]
-	inc hl
-	set 7, [hl]
+	ld a, [hl]
+	bit 7, a		; check if Teleport flag is set in wd732
+	jr nz, .afterConfirm	; if Teleport, skip Fly-specific handling
+	; Fly-specific handling:
+	inc hl			; move to next address (wd733)
+	set 7, [hl]		; set bit 7 in wd733 to mark that Fly was used
+.afterConfirm
+
 .pressedB
 	xor a
 	ld [wTownMapSpriteBlinkingEnabled], a

@@ -71,8 +71,24 @@ Random_::
 	
 ;joenote - rolls 1d16-1	twice and keeps the higher result for each of the four DV values
 ;if boss music is playing, the minimum DVs are 8
+;mc modified this routine to use different DVs based on difficulty level
+; _Random_BiasDV
+; Returns trainer DVs in D and E (each byte stores two stats).
+; - Normal: non-boss DVs are random but clamped to 10; bosses fixed to 10s
+; - Advanced: non-boss DVs are best-of-2 then clamped to 12; bosses fixed to 12s
+; - Master: non-boss DVs are best-of-2 with minimum 8; bosses fixed to 15s
 _Random_BiasDV::
-	
+
+	; First check difficulty early so Normal can use a simpler DV roll.
+	ld a, [wDifficultyLevel]
+	and a
+	jr z, .normalDifficulty
+
+	; ----------------------------
+	; ADVANCED / MASTER:
+	; best-of-2 roll per stat
+	; ----------------------------
+
 	call Random
 	ld b, a
 	and $F0
@@ -80,7 +96,7 @@ _Random_BiasDV::
 	ld a, b
 	and $0F
 	ld l, a
-	
+
 	call Random
 	ld b, a
 	and $F0
@@ -88,7 +104,7 @@ _Random_BiasDV::
 	ld a, b
 	and $0F
 	ld e, a
-	
+
 	call Random
 	ld b, a
 	and $F0
@@ -102,7 +118,7 @@ _Random_BiasDV::
 	jr c, .next2
 	ld l, a
 .next2
-	
+
 	call Random
 	ld b, a
 	and $F0
@@ -116,56 +132,134 @@ _Random_BiasDV::
 	jr c, .next4
 	ld e, a
 .next4
-	
+
+	; Combine into two DV bytes:
+	; D = Atk/Def, E = Spd/Spc (each byte stores two stat DVs).
 	ld a, h
 	or l
 	ld b, a
-	
+
 	ld a, d
 	or e
 	ld d, a
 	ld e, b
-	
-	;if gym leader or champion music playing, make it so values cannot be below 8
-	ld a, [wChannelSoundIDs]
-	cp MUSIC_GYM_LEADER_BATTLE
-	jr z, .isboss
-	cp MUSIC_FINAL_BATTLE
-	jr z, .isboss
-	
-	;check for lorelei, bruno, agatha, giovanni, and rival2
-	;in the vanilla game, these boss trainers are fought with regular trainer battle music
-	ld a, [wCurOpponent]
-	cp SONY2
-	jr z, .isboss
-	cp GIOVANNI
-	jr z, .isboss
-	cp LORELEI
-	jr z, .isboss
-	cp BRUNO
-	jr z, .isboss
-	cp AGATHA
-	jr z, .isboss
 
-	ret
-.isboss
+	; Boss check: if boss, DVs are fixed by difficulty.
+	call IsBossTrainer
+	jr c, .bossDifficultyFixed
+
+	; Not a boss: apply difficulty rules
+	ld a, [wDifficultyLevel]
+	cp DIFF_MASTER
+	jr z, .masterNonBossMin8
+
+	; Advanced non-boss: clamp to 12
+	ld c, $0C            ; cap = 12
 	ld a, d
-	or $98
+	call .ClampDVByteToCap
 	ld d, a
 	ld a, e
-	or $88
+	call .ClampDVByteToCap
 	ld e, a
+	ret
+
+.masterNonBossMin8
+	; Master non-boss: enforce minimum 6 (no cap)
+	ld a, d
+	or $66
+	ld d, a
+	ld a, e
+	or $66
+	ld e, a
+	ret
+
+
+; ----------------------------
+; NORMAL (difficulty 0):
+; random DVs clamped to 5 for non-boss
+; bosses fixed to 7s
+; ----------------------------
+.normalDifficulty
+	call IsBossTrainer
+	jr c, .bossNormalFixed
+
+	; Non-boss: random bytes then clamp each stat DV to 5.
+	call Random
+	ld d, a             ; Atk/Def candidate byte
+	call Random
+	ld e, a             ; Spd/Spc candidate byte
+
+	ld c, $05           ; cap
+	ld a, d
+	call .ClampDVByteToCap
+	ld d, a
+	ld a, e
+	call .ClampDVByteToCap
+	ld e, a
+	ret
+
+
+; ----------------------------
+; Boss fixed DV values
+; ----------------------------
+
+.bossNormalFixed
+	; Normal bosses: all 7s
+	ld de, $7777
+	ret
+
+.bossDifficultyFixed
+	ld a, [wDifficultyLevel]
+	cp DIFF_MASTER
+	jr z, .bossMasterFixed
+
+	; Advanced bosses: all 9s
+	ld de, $9999
+	ret
+
+.bossMasterFixed
+	; Master bosses: all 12s
+	ld de, $CCCC
+	ret
+
+
+; ------------------------------------------------------------
+; .ClampDVByteToCap
+; A = DV byte (two stats packed into one byte)
+; C = cap (0..15)
+; Returns clamped DV byte in A
+; - If either stat DV is above cap, it becomes cap.
+; ------------------------------------------------------------
+.ClampDVByteToCap
+	ld b, a              ; save original
+
+	; Clamp high stat (upper half of the byte)
+	and $F0              ; A = high stat * 16
+	ld h, a              ; H = high part
+	ld a, c
+	swap a               ; A = cap * 16  (cap moved into upper half)
+	and $F0              ; ensure low half is 0
+	cp h
+	jr nc, .highOk
+	ld h, a              ; H = cap * 16
+.highOk
+
+	; Clamp low stat (lower half of the byte)
+	ld a, b
+	and $0F              ; A = low stat (0..15)
+	cp c
+	jr c, .lowOk
+	ld a, c              ; A = cap
+.lowOk
+
+	; Recombine high + low
+	or h
 	ret
 	
 _Random_DV::	;generates four 0 to 15 DVs in DE, and rerolls 1 time for each DV below the value placed in L
 	ld l, 0
 	
-	ld a, [wOptions]	;load game options
-	bit BIT_BATTLE_HARD, a			;check for hard mode
-	jr z, .begin	;if in hard mode, bias the DV upwards a little bit
-	ld l, 4
-	
-.begin
+	;mc remove joe's hard mode DV adjustment
 	call Random
 	ld d, a
 	call Random

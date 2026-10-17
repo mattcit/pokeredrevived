@@ -12,11 +12,11 @@ INCBIN PSYDUCK_FR,0,1 ; 55, sprite dimensions
 dw PsyduckPicFront
 dw PsyduckPicBack
 ; attacks known at lvl 0
-db SCRATCH
 db 0
 db 0
 db 0
-db 0 ; growth rate
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 1,5,6,8
 	tmlearn 9,10,11,12,13,14,16

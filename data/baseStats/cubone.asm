@@ -12,8 +12,8 @@ INCBIN CUBONE_FR,0,1 ; 55, sprite dimensions
 dw CubonePicFront
 dw CubonePicBack
 ; attacks known at lvl 0
-db BONE_CLUB
-db GROWL
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 9,10,11,12,13,14
 	tmlearn 17,18,19,20
 	tmlearn 26,27,28,31,32
-	tmlearn 34,38,40
+	tmlearn 34,37,38,40
 	tmlearn 44
 	tmlearn 50,54
 ;	db 0 ; padding

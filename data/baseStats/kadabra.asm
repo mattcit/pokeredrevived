@@ -12,11 +12,11 @@ INCBIN KADABRA_FR,0,1 ; 66, sprite dimensions
 dw KadabraPicFront
 dw KadabraPicBack
 ; attacks known at lvl 0
-db TELEPORT
-db KINESIS
-db CONFUSION
-db DISABLE
-db 3 ; growth rate
+db 0
+db 0
+db 0
+db 0
+db 5 ; growth rate
 ; learnset
 	tmlearn 1,5,6,8
 	tmlearn 9,10

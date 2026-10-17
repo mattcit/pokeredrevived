@@ -14,6 +14,8 @@ EnterMapAnim:
 	ld hl, wd732
 	bit 4, [hl] ; used dungeon warp?
 	res 4, [hl]
+	;mc reset bit 7 Teleport flag as well
+	res 7, [hl]
 	pop hl
 	jr nz, .dungeonWarpAnimation
 	call PlayerSpinWhileMovingDown
@@ -126,8 +128,13 @@ _LeaveMapAnim:
 	call StopMusic
 	ld a, [wd732]
 	bit 6, a ; is the last used pokemon center the destination?
-	jr z, .flyAnimation
+	;mc also check for bit 7 (the new Teleport flag)
+	jr nz, .spinAnimation
+	bit 7, a ; is the Teleport flag set?
+	jr nz, .spinAnimation
+	jr .flyAnimation
 ; if going to the last used pokemon center
+.spinAnimation
 	ld hl, wPlayerSpinInPlaceAnimFrameDelay
 	ld a, 16
 	ld [hli], a ; wPlayerSpinInPlaceAnimFrameDelay

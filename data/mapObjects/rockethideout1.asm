@@ -10,7 +10,7 @@ RocketHideout1Object:
 
 	db 0 ; signs
 
-	db 7 ; objects
+	db 8 ; objects
 	object SPRITE_ROCKET, 26, 8, STAY, LEFT, 1, OPP_ROCKET, 8
 	object SPRITE_ROCKET, 12, 6, STAY, RIGHT, 2, OPP_ROCKET, 9
 	object SPRITE_ROCKET, 18, 17, STAY, DOWN, 3, OPP_ROCKET, 10
@@ -18,6 +18,8 @@ RocketHideout1Object:
 	object SPRITE_ROCKET, 28, 18, STAY, LEFT, 5, OPP_ROCKET, 12
 	object SPRITE_BALL, 11, 14, STAY, NONE, 6, ESCAPE_ROPE
 	object SPRITE_BALL, 9, 17, STAY, NONE, 7, HYPER_POTION
+	;mc added helix fossil, moved from mt moon
+	object SPRITE_OMANYTE, 27, 12, STAY, NONE, 8, HELIX_FOSSIL
 
 	; warp-to
 	warp_to 23, 2, ROCKET_HIDEOUT_1_WIDTH ; ROCKET_HIDEOUT_2

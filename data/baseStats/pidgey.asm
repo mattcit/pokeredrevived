@@ -12,13 +12,13 @@ INCBIN PIDGEY_FR,0,1 ; 55, sprite dimensions
 dw PidgeyPicFront
 dw PidgeyPicBack
 ; attacks known at lvl 0
-db GUST
 db 0
 db 0
 db 0
-db 3 ; growth rate
+db 0
+db 0 ; growth rate
 ; learnset
-	tmlearn 2,4,6
+	tmlearn 2,6
 	tmlearn 9,10
 	tmlearn 20
 	tmlearn 31,32

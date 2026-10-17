@@ -12,11 +12,11 @@ INCBIN LAPRAS_FR,0,1 ; 77, sprite dimensions
 dw LaprasPicFront
 dw LaprasPicBack
 ; attacks known at lvl 0
-db WATER_GUN
-db GROWL
 db 0
 db 0
-db 5 ; growth rate
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 6,7,8
 	tmlearn 9,10,11,12,13,14,15

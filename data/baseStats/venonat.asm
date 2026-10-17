@@ -12,13 +12,13 @@ INCBIN VENONAT_FR,0,1 ; 55, sprite dimensions
 dw VenonatPicFront
 dw VenonatPicBack
 ; attacks known at lvl 0
-db TACKLE
-db DISABLE
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate
 ; learnset
-	tmlearn 6
+	tmlearn 4,6
 	tmlearn 9,10
 	tmlearn 20,21,22
 	tmlearn 29,31,32

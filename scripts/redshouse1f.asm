@@ -1,9 +1,32 @@
 RedsHouse1FScript:
-	jp EnableAutoTextBoxDrawing
+	call EnableAutoTextBoxDrawing
+	ld hl, RedsHouse1FScriptPointers
+	ld a, [wRedsHouse1CurScript]
+	jp CallFunctionInTable
+
+RedsHouse1FScriptPointers:
+	dw RedsHouse1FScript0
+	dw RedsHouse1FScript1
+
+RedsHouse1FScript0:
+	xor a
+	ld [hJoyHeld], a
+	ld a, PLAYER_DIR_LEFT
+	ld [wPlayerMovingDirection], a
+	ld a, 3
+	ld [hSpriteIndexOrTextID], a
+	call DisplayTextID
+	ld a, 1
+	ld [wRedsHouse1CurScript], a
+	ret
+
+RedsHouse1FScript1:
+	ret
 
 RedsHouse1FTextPointers:
 	dw RedsHouse1FText1
 	dw RedsHouse1FText2
+	dw RedsHouse1FText3
 
 RedsHouse1FText1: ; Mom
 	TX_ASM
@@ -66,4 +89,8 @@ StandByMeText:
 
 TVWrongSideText:
 	TX_FAR _TVWrongSideText
+	db "@"
+
+RedsHouse1FText3:
+	TX_FAR _MomRunningShoesText
 	db "@"

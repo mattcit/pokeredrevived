@@ -118,7 +118,8 @@ const_value = 0
 	const HS_MT_MOON_3_FOSSIL_1           ; 6D
 	const HS_MT_MOON_3_FOSSIL_2           ; 6E
 	const HS_MT_MOON_3_ITEM_1             ; 6F X
-	const HS_MT_MOON_3_ITEM_2             ; 70 X
+	;mc removed helix from mt moon, moved to rocket hideout
+	;const HS_MT_MOON_3_ITEM_2             ; 70 X
 	const HS_SS_ANNE_2_RIVAL              ; 71
 	const HS_SS_ANNE_8_ITEM               ; 72 X
 	const HS_SS_ANNE_9_ITEM_1             ; 73 X
@@ -131,6 +132,8 @@ const_value = 0
 	const HS_VICTORY_ROAD_3_BOULDER       ; 7A
 	const HS_ROCKET_HIDEOUT_1_ITEM_1      ; 7B X
 	const HS_ROCKET_HIDEOUT_1_ITEM_2      ; 7C X
+	;mc added helix fossil to rocket hideout, moved from mt moon
+	const HS_ROCKET_HIDEOUT_1_ITEM_3
 	const HS_ROCKET_HIDEOUT_2_ITEM_1      ; 7D X
 	const HS_ROCKET_HIDEOUT_2_ITEM_2      ; 7E X
 	const HS_ROCKET_HIDEOUT_2_ITEM_3      ; 7F X
@@ -207,6 +210,8 @@ const_value = 0
 	const HS_SAFARI_ZONE_EAST_ITEM_4      ; C6 X
 	const HS_SAFARI_ZONE_NORTH_ITEM_1     ; C7 X
 	const HS_SAFARI_ZONE_NORTH_ITEM_2     ; C8 X
+	;mc added gold watch
+	const HS_SAFARI_ZONE_NORTH_ITEM_3
 	const HS_SAFARI_ZONE_WEST_ITEM_1      ; C9 X
 	const HS_SAFARI_ZONE_WEST_ITEM_2      ; CA X
 	const HS_SAFARI_ZONE_WEST_ITEM_3      ; CB X

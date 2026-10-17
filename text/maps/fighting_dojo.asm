@@ -31,7 +31,14 @@ _FightingDojoText_5ce98::
 	cont "fighting #MON!"
 
 	para "Choose whichever"
-	line "one you like!"
+	line "one you like--"
+	cont "and I'll make you"
+	cont "a deal:"
+
+	para "If you can defeat"
+	line "SABRINA, I'll let"
+	cont "you have both"
+	cont "#MON!"
 	done
 
 _FightingDojoText_5ce9d::
@@ -52,11 +59,14 @@ _FightingDojoEndBattleText1::
 	prompt
 
 _FightingDojoAfterBattleText1::
-	text "You wait 'til you"
-	line "see our Master!"
+	text "I heard there's"
+	line "a LAB on CINNABAR"
+	cont "ISLAND where they"
+	cont "sell strong TMs.."
 
-	para "I'm a small fry"
-	line "compared to him!"
+	para "Maybe my #MON"
+	line "just need some"
+	cont "better moves?"
 	done
 
 _FightingDojoBattleText2::
@@ -125,6 +135,8 @@ _WantHitmonchanText::
 	done
 
 _OtherHitmonText::
-	text "Better not get"
-	line "greedy..."
+	text "MASTER: If you"
+	line "defeat SABRINA"
+	cont "you can have the"
+	cont "other #MON!"
 	done

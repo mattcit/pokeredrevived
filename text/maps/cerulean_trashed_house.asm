@@ -7,27 +7,30 @@ _CeruleanTrashedText_1d6ab::
 
 	para "They stole a TM"
 	line "for teaching"
-	cont "#MON how to"
-	cont "DIG holes!"
+	cont "#MON my"
+	cont "favorite move.."
 
-	para "That cost me a"
-	line "bundle, it did!"
+	para "MUD SLAP!"
+	line "If you find them,"
+	cont "I hope that you"
+	cont "make them pay!"
 	done
 
 _CeruleanTrashedText_1d6b0::
-	text "I figure what's"
-	line "lost is lost!"
+	text "You can keep it,"
+	line "the TM I mean!"
 
-	para "I decided to teach"
-	line "DIGLETT how to"
-	cont "DIG without a TM!"
+	para "My DIGLETT knows"
+	line "MUD SLAP already,"
+	cont "so I don't even"
+	cont "need the TM!"
 	done
 
 _CeruleanHouseTrashedText2::
-	text "TEAM ROCKET must"
-	line "be trying to DIG"
-	cont "their way into no"
-	cont "good!"
+	text "If I were a"
+	line "#MON, I'd give"
+	cont "TEAM ROCKET a"
+	cont "MUD SLAP myself!"
 	done
 
 IF DEF(_JPTXT)

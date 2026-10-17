@@ -62,7 +62,18 @@ ENDC
 	ld a, BANK(PokemonLogoGraphics)
 	call FarCopyData2          ; second chunk
 	ld hl, Version_GFX
+;claude: AST-3: the stock formula grows the loaded tile range symmetrically outward
+;claude: from a fixed center as Version_GFX's size changes (see titlerebrand-rom-report.md).
+;claude: RED grew from 10 to 12 tiles, and symmetric growth would start the range at tile $5F --
+;claude: but home/text.asm's PlaceString treats byte $5F as the "dex" dictionary control code
+;claude: (it prints "." and aborts the rest of the string), not a literal tile index. Anchoring
+;claude: RED's range to a fixed left edge of $60 instead keeps every tile index in the safe,
+;claude: non-control range the way the original 10-tile range always did.
+IF DEF(_RED)
+	ld de, vChars2 + $600 - (Version_GFXEnd - Version_GFX - $60)
+ELSE
 	ld de, vChars2 + $600 - (Version_GFXEnd - Version_GFX - $50)
+ENDC
 	ld bc, Version_GFXEnd - Version_GFX
 	ld a, BANK(Version_GFX)
 	call FarCopyDataDouble
@@ -511,6 +522,9 @@ INCLUDE "data/title_mons.asm"
 PrintGameVersionOnTitleScreen:
 IF DEF(_GREEN)
 	coord hl, 6, 8
+ELIF DEF(_RED)
+;claude: widened graphic (7->12 tiles) needs re-centering: (20 - 12) / 2 = 4
+	coord hl, 4, 8
 ELSE
 	coord hl, 7, 8
 ENDC
@@ -518,9 +532,13 @@ ENDC
 	jp PlaceString
 
 ; these point to special tiles specifically loaded for that purpose and are not usual text
+;mc change Red Version to use new Choice Red title
+;claude: AST-3: widened to "Choice Red Version!" (12 tiles), loaded at VRAM tiles $60-$6B
+;claude: (left edge pinned at $60 -- see the FarCopyDataDouble call above -- so the range
+;claude: doesn't dip into $5F, which PlaceString's dictionary intercepts as a control code)
 VersionOnTitleScreenText:
 IF DEF(_RED)
-	db $60,$61,$7F,$65,$66,$67,$68,$69,"@" ; "Red Version"
+	db $60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$6A,$6B,"@" ; "Choice Red Version!"
 ENDC
 IF DEF(_BLUE)
 	db $61,$62,$63,$64,$65,$66,$67,$68,"@" ; "Blue Version"

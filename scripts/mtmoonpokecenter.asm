@@ -34,10 +34,13 @@ MagikarpSalesmanText:
 	ld a, [wCurrentMenuItem]
 	and a
 	jp nz, .choseNo
-	ld [hMoney], a
-	ld [hMoney + 2], a
-	ld a, $5
+	;mc change magikarp price from $500 to $5000
+ 	ld a, $00
+ 	ld [hMoney], a
+ 	ld a, $50
 	ld [hMoney + 1], a
+	xor a
+	ld [hMoney + 2], a
 	call HasEnoughMoney
 	jr nc, .enoughMoney
 	ld hl, .NoMoneyText
@@ -46,11 +49,13 @@ MagikarpSalesmanText:
 	lb bc, MAGIKARP, 5
 	call GivePokemon
 	jr nc, .done
-	xor a
-	ld [wPriceTemp], a
-	ld [wPriceTemp + 2], a
-	ld a, $5
+	;mc change magikarp price from $500 to $5000
+	ld a, $00
+ 	ld [wPriceTemp], a
+ 	ld a, $50
 	ld [wPriceTemp + 1], a
+	xor a
+	ld [wPriceTemp + 2], a
 	ld hl, wPriceTemp + 2
 	ld de, wPlayerMoney + 2
 	ld c, $3

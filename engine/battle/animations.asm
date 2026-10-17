@@ -2697,13 +2697,17 @@ MoveSoundTable:
 	db SFX_BATTLE_2C,         $d8,$04 ; SUBSTITUTE
 	;mc add new moves
 	db SFX_BATTLE_1E,         $00,$80 ; BUG_BITE
+	db SFX_BATTLE_1E,         $00,$80 ; BUG_BUZZ
 	db SFX_BATTLE_0C,         $10,$80 ; CROSS_CHOP
 	db SFX_BATTLE_29,         $f0,$80 ; DRAGONBREATH
 	db SFX_BATTLE_12,         $00,$c0 ; ICY_WIND
+	db SFX_BATTLE_1C,         $00,$ff ; MUD_SHOT
 	db SFX_BATTLE_1C,         $00,$ff ; MUD_SLAP
 	db SFX_BATTLE_14,         $01,$e0 ; SHADOW_BALL
 	db SFX_BATTLE_2F,         $00,$20 ; SPARK
 	db SFX_BATTLE_36,         $f0,$20 ; STONE_EDGE
+	db SFX_BATTLE_36,         $f0,$20 ; X_SCISSOR
+	db SFX_BATTLE_29,         $1f,$20 ; FLAME_WHEEL
 	db SFX_BATTLE_0B,         $00,$80 ; STRUGGLE
 	db SFX_BATTLE_0B,         $00,$80
 

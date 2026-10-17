@@ -1,7 +1,7 @@
 PalletTownScript:
-	CheckEvent EVENT_GOT_POKEBALLS_FROM_OAK
+	CheckEvent EVENT_GOT_POTIONS_FROM_OAK
 	jr z, .next
-	SetEvent EVENT_PALLET_AFTER_GETTING_POKEBALLS
+	SetEvent EVENT_PALLET_AFTER_GETTING_POTIONS
 .next
 	call EnableAutoTextBoxDrawing
 	ld hl, PalletTownScriptPointers
@@ -142,9 +142,9 @@ PalletTownScript5:
 	ld [wMissableObjectIndex], a
 	predef_jump ShowObject
 .next
-	CheckEvent EVENT_GOT_POKEBALLS_FROM_OAK
+	CheckEvent EVENT_GOT_POTIONS_FROM_OAK
 	ret z
-	SetEvent EVENT_PALLET_AFTER_GETTING_POKEBALLS_2
+	SetEvent EVENT_PALLET_AFTER_GETTING_POTIONS_2
 PalletTownScript6:
 	ret
 

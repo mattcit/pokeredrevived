@@ -15,16 +15,36 @@ ReadTrainer:
 	ld [hl], a
 
 
+;mc load different trainer parties for hard mode
 ; get the pointer to trainer data for this class
 	;ld a, [wCurOpponent]
 	;sub $C9 ; convert value from pokemon to trainer
 	ld a,[wTrainerClass] ; joenote - just get trainer class directly
 	dec a
 	add a
+;— pick the right party-pointer table based on difficulty —
+	ld c, a ; save classIndex (A = 2*(class-1))
+
+	ld a, [wDifficultyLevel]
+	cp DIFF_ADVANCED
+	jr z, .UseAdvancedParties
+	cp DIFF_MASTER
+	jr z, .UseMasterParties
+
+; Normal
 	ld hl, TrainerDataPointers
-	ld c, a
+	jr .GotPartyTable
+
+.UseAdvancedParties
+	ld hl, TrainerDataPointersAdvanced
+	jr .GotPartyTable
+
+.UseMasterParties
+	ld hl, TrainerDataPointersMaster
+
+.GotPartyTable
 	ld b, 0
-	add hl, bc ; hl points to trainer class
+	add  hl, bc ; hl points to trainer class
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
@@ -152,13 +172,34 @@ ReadTrainer:
 ;	ld [wEnemyMon6Moves + 2], a
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;mc add custom trainer moves for each difficulty level
 .AddAdditionalMoveData
 ; does the trainer have additional move data?
 	ld a, [wTrainerClass]
 	ld b, a
 	ld a, [wTrainerNo]
 	ld c, a
+	;— pick the right special-moves table based on difficulty —
+	ld a, [wDifficultyLevel]
+	cp DIFF_ADVANCED
+	jr z, .UseAdvancedSpecial
+	cp DIFF_MASTER
+	jr z, .UseMasterSpecial
+
+; Normal
 	ld hl, SpecialTrainerMoves
+	jr .AfterSpecialSelect
+
+.UseAdvancedSpecial
+	ld hl, SpecialTrainerMovesAdvanced
+	jr .AfterSpecialSelect
+
+.UseMasterSpecial
+	ld hl, SpecialTrainerMovesMaster
+
+.AfterSpecialSelect
+
 .loopAdditionalMoveData
 	ld a, [hli]
 	cp $ff
@@ -197,7 +238,9 @@ ReadTrainer:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 
 .FinishUp
-;joenote - prevent prize money from being capped at 9999
+;mc new prize money system:
+; if the trainer's base money is set, just use that value directly as the prize money
+; if base money is 0, calculate the prize money using a different formula depending on the enemy mon's level
 ; clear wAmountMoneyWon addresses
 	xor a
 	ld [wTrainerBaseMoney - 1], a
@@ -207,11 +250,102 @@ ReadTrainer:
 	ld [de], a
 	inc de
 	ld [de], a
+
+;claude: TRN-6 -- Giovanni is fought at 3 locations (Rocket Hideout/Silph Co/Gym) and now
+;claude: wants a distinct flat prize per encounter instead of one value shared by all 3.
+;claude: His trainer_pic_money_pointers.asm entry is zeroed like the tiered-formula
+;claude: classes below, so this has to run first or he'd fall into that formula instead.
+;claude: Distinguished by wTrainerNo (1/2/3), which InitBattleEnemyParameters already sets
+;claude: from wEngagedTrainerSet -- the same per-encounter number the map objects already
+;claude: carry (OPP_GIOVANNI, 1 in data/mapObjects/rockethideout4.asm; ...,2 in
+;claude: silphco11.asm; ...,3 in viridiangym.asm) and that this routine already reads for
+;claude: the special-moves lookup above -- no new state needed.
+	ld a, [wTrainerClass]
+	cp GIOVANNI
+	jr nz, .notGiovanni
+	ld a, [wTrainerNo]
+	cp 1
+	jr z, .giovanniRocketHideout
+	cp 2
+	jr z, .giovanniSilphCo
+; wTrainerNo == 3, Viridian Gym
+	ld a, $02 ; 20000
+	ld [wTrainerBaseMoney], a
+	xor a
+	ld [wTrainerBaseMoney + 1], a
+	jr .useBaseMoney
+.giovanniRocketHideout
+	ld a, $01 ; 10000
+	ld [wTrainerBaseMoney], a
+	xor a
+	ld [wTrainerBaseMoney + 1], a
+	jr .useBaseMoney
+.giovanniSilphCo
+	ld a, $01 ; 15000
+	ld [wTrainerBaseMoney], a
+	ld a, $50
+	ld [wTrainerBaseMoney + 1], a
+	jr .useBaseMoney
+.notGiovanni
+
+; Check if wTrainerBaseMoney is zero and set custom value if needed
+	ld a, [wTrainerBaseMoney]
+	ld b, a
+	ld a, [wTrainerBaseMoney + 1]
+	or b
+	jr z, .setCustomBaseMoney
+
+; load wTrainerBaseMoney directly into wAmountMoneyWon and return
+.useBaseMoney
+	ld a, [wTrainerBaseMoney]
+	ld [wAmountMoneyWon], a
+	ld a, [wTrainerBaseMoney + 1]
+	ld [wAmountMoneyWon + 1], a
+	xor a ; wTrainerBaseMoney is only a 2 byte address, so just assume the last byte is zero
+	ld [wAmountMoneyWon + 2], a
+	ret
+
+.setCustomBaseMoney
+	ld a, [wCurEnemyLVL]
+	cp 20
+	jr nc, .checkLevel30
+	; Set to 0040
+	xor a
+	ld [wTrainerBaseMoney], a
+	ld a, $40
+	ld [wTrainerBaseMoney + 1], a
+	jr .skipCustomBaseMoney
+.checkLevel30
+	cp 30
+	jr nc, .checkLevel40
+	; Set to 0120
+	ld a, $00
+	ld [wTrainerBaseMoney], a
+	ld a, $60
+	ld [wTrainerBaseMoney + 1], a
+	jr .skipCustomBaseMoney
+.checkLevel40
+	cp 40
+	jr nc, .level40Plus
+	; Set to 0180
+	ld a, $00
+	ld [wTrainerBaseMoney], a
+	ld a, $90
+	ld [wTrainerBaseMoney + 1], a
+	jr .skipCustomBaseMoney
+.level40Plus
+	; Set to 0320
+	ld a, $01
+	ld [wTrainerBaseMoney], a
+	ld a, $30
+	ld [wTrainerBaseMoney + 1], a
+
+.skipCustomBaseMoney
 	ld a, [wCurEnemyLVL]
 	ld b, a
 .LastLoop
 ; update wAmountMoneyWon addresses (money to win) based on enemy's level
-	ld hl, wTrainerBaseMoney + 1
+	ld hl, wTrainerBaseMoney + 1  ; Start at least significant digit
 	ld c, 3 ; wAmountMoneyWon is a 3-byte number
 	push bc
 	predef AddBCDPredef

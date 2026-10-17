@@ -7,16 +7,8 @@ AIEnemyTrainerChooseMoves:
 	jr nz, .notwildbattle
 	;wild battle confirmed at this point
 	ld hl, wEnemyMonMoves	;restore this address which was clobbered by callba
-	;ret z ; wild encounter	;uncomment this line to restore default wildmon behavior
-	;but let's do a little something else
-	;only do wildmon AI move choice for Mewtwo while in SET mode
-	;after all, it is still a cunning foe even as a wild pokemon
-	ld a, [wOptions]
-	bit BIT_BATTLE_HARD, a ;check for hard mode
-	ret z ;wild AI as normal in outside of hard mode
-	ld a, [wEnemyMon]	
-	cp MEWTWO
-	ret nz
+;mc remove joe's hard mode mewtwo ai adjustment
+	ret z ; wild encounter	;uncomment this line to restore default wildmon behavior
 	;load the Sailor class since it only uses AI routines 1 and 3
 	ld a, SAILOR
 	ld [wTrainerClass], a
@@ -1478,18 +1470,18 @@ TrainerAIPointers:
 	dbw 3,GenericAI
 	dbw 2,CooltrainerMAI ; cooltrainerm
 	dbw 1,CooltrainerFAI ; cooltrainerf
-	dbw 2,BrunoAI ; bruno
-	dbw 5,BrockAI ; brock
-	dbw 1,MistyAI ; misty
+	dbw 1,BrunoAI ; bruno
+	dbw 5,GenericAI ; brock
+	dbw 1,GenericAI ; misty
 	dbw 1,LtSurgeAI ; surge
 	dbw 1,ErikaAI ; erika
-	dbw 2,KogaAI ; koga
-	dbw 2,BlaineAI ; blaine
-	dbw 1,SabrinaAI ; sabrina
+	dbw 1,KogaAI ; koga
+	dbw 1,BlaineAI ; blaine
+	dbw 1,GenericAI ; sabrina
 	dbw 3,GenericAI
 	dbw 1,Sony2AI ; sony2
 	dbw 1,Sony3AI ; sony3
-	dbw 2,LoreleiAI ; lorelei
+	dbw 1,LoreleiAI ; lorelei
 	dbw 3,GenericAI
 	dbw 2,AgathaAI ; agatha
 	dbw 1,LanceAI ; lance
@@ -1498,35 +1490,35 @@ TrainerAIPointers:
 ;also adding recognition of a switch-pkmn bit
 
 JugglerAI:
-	cp $40
+	cp 64 ; 25% chance
 	jp c, AISwitchIfEnoughMons
 	ret
 	
 BlackbeltAI:
 	call AIItemsLowHPCheck
 	jp c, TrainerAI.NoItem
-	cp $20
+	cp 32 ; 12.5% chance
 	jp c, AIUseXAttack	
 	ret
 	
 GiovanniAI:
-	call AIItemsLowHPCheck
+	call AIItemsFullHPCheck ; only use item if ai hp is 100% and player hp is > 50%
 	jp c, TrainerAI.NoItem
-	cp $40
-	jp c, AIUseGuardSpec
+	cp 64 ; compare random number in a to 64 (64/256 aka 25% chance)
+	jp c, AIUseXAttack
 	ret
 
 CooltrainerMAI:	
 	call AIItemsLowHPCheck
 	jp c, TrainerAI.NoItem
-	cp $40
+	cp 64 ; 25% chance
 	jp c, AIUseXAttack
 	ret
 	
 CooltrainerFAI:
 	call AIItemsLowHPCheck
 	jp c, TrainerAI.NoItem
-	cp $40
+	cp 64 ; 25% chance
 	jr nc, .coolFreturn
 	ld a, $5
 	call AICheckIfHPBelowFraction
@@ -1544,62 +1536,78 @@ BrockAI:
 MistyAI:
 	call AIItemsLowHPCheck
 	jp c, TrainerAI.NoItem
-	cp $40
+	cp 64 ; 25% chance
 	jp c, AIUseXDefend
 	ret
 	
 LtSurgeAI:
-	call AIItemsLowHPCheck
+	call AIItemsFullHPCheck ; only use item if ai hp is 100% and player hp is > 50%
 	jp c, TrainerAI.NoItem
-	cp $40
-	jp c, AIUseXSpeed
+	cp 64 ; compare random number in a to 64 (64/256 aka 25% chance)
+	jp c, AIUseXSpecial
 	ret
 	
 ErikaAI:
-	cp $80
+	cp 64 ; 25% chance to use a potion
 	jr nc, .erikareturn
-	ld a, $A
+	ld a, 5
 	call AICheckIfHPBelowFraction
 	jp c, AIUseSuperPotion
 .erikareturn
 	ret
 
 KogaAI:
-	call AIItemsLowHPCheck
-	jp c, TrainerAI.NoItem
-	cp $40
-	jp c, AIUseXAttack
-	ret
+	; if their active pokemon has a status condition, use a full heal
+	; only use item if their pokemons hp is > 50%
+	ld a, 2                   ; Set threshold to 1/2 (50%)
+    call AICheckIfHPBelowFraction
+    jp c, TrainerAI.NoItem    ; Skip item usage if HP < 50%
+
+	cp 64                     ; Compare random value in 'a' to 64 (64/256 = 25%)
+    jr nc, .kogareturn        ; Skip Full Heal usage if random value >= 64
+
+    ; Check if pokemon has a status condition
+    ld a, [wEnemyMonStatus]   ; Load pokemons status condition
+    and a
+    jp nz, AIUseFullHeal      ; Use Full Heal if there is a status condition
+.kogareturn
+    ret                       ; Do nothing otherwise
 	
-BlaineAI:	;blaine needs to check HP. this was an oversight	
-	cp $40
-	jr nc, .blainereturn
-	ld a, $2
-	call AICheckIfHPBelowFraction	
-	jp c, AIUseSuperPotion
-.blainereturn
+BlaineAI:	
+	call AIItemsFullHPCheck ; only use item if ai hp is 100% and player hp is > 50%
+	jp c, TrainerAI.NoItem
+	cp 85 ; compare random number in a to 85 (85/256 aka 33% chance)
+	jp c, AIUseXSpecial
 	ret
 
 SabrinaAI:
-	cp $40
+	cp 64 ; 25% chance
 	jr nc, .sabrinareturn
-	ld a, $A
+	ld a, 10
 	call AICheckIfHPBelowFraction
 	jp c, AIUseHyperPotion
 .sabrinareturn
 	ret
 
 Sony2AI:
-	cp $20
-	jr nc, .rival2return
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	jp c, AIUsePotion
+	; if his active pokemon has a status condition, use a full heal
+	; only use item if his pokemons hp is > 50%
+	ld a, 2                   ; Set threshold to 1/2 (50%)
+    call AICheckIfHPBelowFraction
+    jp c, TrainerAI.NoItem    ; Skip item usage if HP < 50%
+
+	cp 64                     ; Compare random value in 'a' to 64 (64/256 = 25%)
+    jr nc, .rival2return      ; Skip Full Heal usage if random value >= 64
+
+    ; Check if pokemon has a status condition
+    ld a, [wEnemyMonStatus]   ; Load pokemons status condition
+    and a
+    jp nz, AIUseFullHeal      ; Use Full Heal if there is a status condition
 .rival2return
-	ret
+    ret                       ; Do nothing otherwise
 
 Sony3AI:
-	cp $20
+	cp 64 ; 25% chance
 	jr nc, .rival3return
 	ld a, 5
 	call AICheckIfHPBelowFraction
@@ -1608,33 +1616,39 @@ Sony3AI:
 	ret
 
 LoreleiAI:
-	cp $80
-	jr nc, .loreleireturn
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	jp c, AIUseSuperPotion	
-.loreleireturn
+	call AIItemsFullHPCheck ; only use item if ai hp is 100% and player hp is > 50%
+	jp c, TrainerAI.NoItem
+	cp 85 ; compare random number in a to 85 (85/256 aka 33% chance)
+	jp c, AIUseXSpecial
 	ret
 
 
 BrunoAI:
-	cp $40
-	jp c, AIUseXDefend
+	call AIItemsFullHPCheck ; only use item if ai hp is 100% and player hp is > 50%
+	jp c, TrainerAI.NoItem
+	cp 64 ; compare random number in a to 64 (64/256 aka 25% chance)
+	jp c, AIUseDireHit
 	ret
 
 AgathaAI:
-;	cp $14
-;	jp c, AISwitchIfEnoughMons
-	cp $80
-	jr nc, .agathareturn
-	ld a, $4
-	call AICheckIfHPBelowFraction
-	jp c, AIUseSuperPotion
+	; if their active pokemon has a status condition, use a full heal
+	; only use item if their pokemons hp is > 50%
+	ld a, 2                   ; Set threshold to 1/2 (50%)
+    call AICheckIfHPBelowFraction
+    jp c, TrainerAI.NoItem    ; Skip item usage if HP < 50%
+
+	cp 64                     ; Compare random value in 'a' to 64 (64/256 = 25%)
+    jr nc, .agathareturn      ; Skip Full Heal usage if random value >= 64
+
+    ; Check if pokemon has a status condition
+    ld a, [wEnemyMonStatus]   ; Load pokemons status condition
+    and a
+    jp nz, AIUseFullHeal      ; Use Full Heal if there is a status condition
 .agathareturn
-	ret
+    ret                       ; Do nothing otherwise
 
 LanceAI:
-	cp $80
+	cp 128 ; 50% chance
 	jr nc, .lancereturn
 	ld a, 5
 	call AICheckIfHPBelowFraction
@@ -2192,3 +2206,22 @@ AIItemsLowHPCheck:
 	ld a, b
 	pop bc
 	ret
+
+;mc add custom routine to check if ai pokemons hp is at 100%
+AIItemsFullHPCheck:
+    push bc                     ; Save registers
+    ld b, a                     ; Store initial value of 'a'
+
+    ; Check the player's pokemon's HP
+    ld a, 2                     ; Threshold: 1/2 (50%)
+    call AICheckIfPlayerHPBelowFraction
+    jr c, .return               ; Skip further checks if player's pokemon HP is below 50%
+
+    ; Check if AI pokemon's HP is 100%
+    ld a, 1                     ; Threshold: 1/1 (100%)
+    call AICheckIfHPBelowFraction
+
+.return
+    ld a, b                     ; Restore initial value of 'a'
+    pop bc                      ; Restore registers
+    ret

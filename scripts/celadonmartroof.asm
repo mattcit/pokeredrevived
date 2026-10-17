@@ -90,7 +90,7 @@ CeladonMartRoofScript_GiveDrinkToGirl:
 	ld hl, CeladonMartRoofText_48515
 	call PrintText
 	call RemoveItemByIDBank12
-	lb bc, TM_49, 1
+	lb bc, TM_28, 1 ; change tri attack to dig
 	call GiveItem
 	jr nc, .bagFull
 	ld hl, ReceivedTM49Text

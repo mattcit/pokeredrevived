@@ -35,3 +35,22 @@ _StandByMeText::
 _TVWrongSideText::
 	text "Oops, wrong side."
 	done
+
+_MomRunningShoesText::
+	text "MOM: <PLAYER>!"
+	line "You woke up late"
+	cont "today, huh?"
+
+	para "PROF.OAK has been"
+	line "looking for you!"
+
+	para "Oh, I see that"
+	line "you're wearing"
+	cont "your brand new"
+	cont "RUNNING SHOES!"
+
+	para "The package said"
+	line "'HOLD B TO RUN',"
+	cont "whatever could"
+	cont "that mean?"
+	done

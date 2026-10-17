@@ -10,22 +10,30 @@ ViridianForestObject:
 	warp 18, 47, 1, VIRIDIAN_FOREST_ENTRANCE
 
 	db 6 ; signs
-	sign 24, 40, 9 ; ViridianForestText9
-	sign 16, 32, 10 ; ViridianForestText10
-	sign 26, 17, 11 ; ViridianForestText11
-	sign 4, 24, 12 ; ViridianForestText12
-	sign 18, 45, 13 ; ViridianForestText13
-	sign 2, 1, 14 ; ViridianForestText14
+	sign 24, 40, 16 ; ViridianForestText16
+	sign 16, 32, 17 ; ViridianForestText17
+	sign 26, 17, 18 ; ViridianForestText18
+	sign 4, 24, 19 ; ViridianForestText19
+	sign 18, 45, 20 ; ViridianForestText20
+	sign 2, 1, 21 ; ViridianForestText21
 
-	db 8 ; objects
-	object SPRITE_BUG_CATCHER, 16, 43, STAY, NONE, 1 ; person
-	object SPRITE_BUG_CATCHER, 30, 33, STAY, LEFT, 2, OPP_BUG_CATCHER, 1
-	object SPRITE_BUG_CATCHER, 30, 19, STAY, LEFT, 3, OPP_BUG_CATCHER, 2
-	object SPRITE_BUG_CATCHER, 2, 18, STAY, LEFT, 4, OPP_BUG_CATCHER, 3
-	object SPRITE_BALL, 25, 11, STAY, NONE, 5, ANTIDOTE
-	object SPRITE_BALL, 12, 29, STAY, NONE, 6, POTION
-	object SPRITE_BALL, 1, 31, STAY, NONE, 7, POKE_BALL
-	object SPRITE_BUG_CATCHER, 27, 40, STAY, NONE, 8 ; person
+	db 15 ; objects
+	;mc added more trainers
+	object SPRITE_BUG_CATCHER, 30, 33, STAY, LEFT, 1, OPP_BUG_CATCHER, 1
+	object SPRITE_BUG_CATCHER, 30, 19, STAY, LEFT, 2, OPP_BUG_CATCHER, 2
+	object SPRITE_BUG_CATCHER, 2, 18, STAY, LEFT, 3, OPP_BUG_CATCHER, 3
+	object SPRITE_BUG_CATCHER, 10, 43, STAY, UP, 4, OPP_BUG_CATCHER, 14
+	object SPRITE_LASS, 6, 38, STAY, RIGHT, 5, OPP_LASS, 19
+	object SPRITE_BUG_CATCHER, 6, 35, STAY, RIGHT, 6, OPP_YOUNGSTER, 13
+	object SPRITE_BUG_CATCHER, 31, 5, STAY, RIGHT, 7, OPP_YOUNGSTER, 14
+	object SPRITE_BUG_CATCHER, 28, 1, STAY, DOWN, 8, OPP_BUG_CATCHER, 15
+	object SPRITE_LASS, 25, 1, STAY, DOWN, 9, OPP_LASS, 20
+	object SPRITE_BUG_CATCHER, 21, 1, STAY, DOWN, 10, OPP_YOUNGSTER, 15
+	object SPRITE_BALL, 25, 11, STAY, NONE, 11, ANTIDOTE
+	object SPRITE_BALL, 12, 29, STAY, NONE, 12, POTION
+	object SPRITE_BALL, 1, 31, STAY, NONE, 13, POKE_BALL
+	object SPRITE_BUG_CATCHER, 16, 43, STAY, NONE, 14 ; person
+	object SPRITE_BUG_CATCHER, 27, 40, STAY, NONE, 15 ; person
 
 	; warp-to
 	warp_to 1, 0, VIRIDIAN_FOREST_WIDTH ; VIRIDIAN_FOREST_EXIT

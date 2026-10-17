@@ -12,11 +12,11 @@ INCBIN TENTACOOL_FR,0,1 ; 55, sprite dimensions
 dw TentacoolPicFront
 dw TentacoolPicBack
 ; attacks known at lvl 0
-db ACID
 db 0
 db 0
 db 0
-db 5 ; growth rate
+db 0
+db 0 ; growth rate
 ; learnset
 	tmlearn 3,6
 	tmlearn 9,10,11,12,13,14

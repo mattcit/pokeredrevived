@@ -13,7 +13,7 @@ INCBIN MEW_FR,0,1 ; 55, sprite dimensions
 dw MewPicFront
 dw MewPicBack
 ; attacks known at lvl 0
-db POUND
+db 0
 db 0
 db 0
 db 0

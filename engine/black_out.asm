@@ -16,7 +16,8 @@ ResetStatusAndHalveMoneyOnBlackout::
 	call HasEnoughMoney
 	jr c, .lostmoney ; never happens
 
-	; Halve the player's money.
+	;mc player only loses 5% of their money instead of half
+	; Calculate 5% of the player's money
 	ld a, [wPlayerMoney]
 	ld [hMoney], a
 	ld a, [wPlayerMoney + 1]
@@ -26,15 +27,23 @@ ResetStatusAndHalveMoneyOnBlackout::
 	xor a
 	ld [hDivideBCDDivisor], a
 	ld [hDivideBCDDivisor + 1], a
-	ld a, 2
+	ld a, $20
 	ld [hDivideBCDDivisor + 2], a
 	predef DivideBCDPredef3
+	
+	; Store the 5% amount in hMoney
 	ld a, [hDivideBCDQuotient]
-	ld [wPlayerMoney], a
+	ld [hMoney], a
 	ld a, [hDivideBCDQuotient + 1]
-	ld [wPlayerMoney + 1], a
+	ld [hMoney + 1], a
 	ld a, [hDivideBCDQuotient + 2]
-	ld [wPlayerMoney + 2], a
+	ld [hMoney + 2], a
+	
+	; Subtract the 5% from the player's money
+	ld de, wPlayerMoney + 2
+	ld hl, hMoney + 2
+	ld c, 3
+	predef SubBCDPredef
 
 .lostmoney
 	ld hl, wd732

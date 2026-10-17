@@ -12,8 +12,8 @@ INCBIN RATTATA_FR,0,1 ; 55, sprite dimensions
 dw RattataPicFront
 dw RattataPicBack
 ; attacks known at lvl 0
-db TACKLE
-db TAIL_WHIP
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 9,10,11,12,14
 	tmlearn 20,24
 	tmlearn 25,28,31,32
-	tmlearn 34,39,40
+	tmlearn 34,35,39,40
 	tmlearn 44
 	tmlearn 50
 ;	db 0 ; padding

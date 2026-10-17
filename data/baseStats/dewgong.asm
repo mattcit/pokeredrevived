@@ -12,11 +12,11 @@ INCBIN DEWGONG_FR,0,1 ; 66, sprite dimensions
 dw DewgongPicFront
 dw DewgongPicBack
 ; attacks known at lvl 0
-db HEADBUTT
-db GROWL
-db AURORA_BEAM
 db 0
-db 0 ; growth rate
+db 0
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 6,7,8
 	tmlearn 9,10,11,12,13,14,15,16

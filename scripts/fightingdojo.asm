@@ -253,6 +253,9 @@ FightingDojoText6:
 	TX_ASM
 	CheckEitherEventSet EVENT_GOT_HITMONLEE, EVENT_GOT_HITMONCHAN
 	jr z, .GetMon
+	;mc give other hitmon if player beat sabrina
+	CheckEvent EVENT_BEAT_SABRINA
+	jr nz, .GetMon
 	ld hl, OtherHitmonText
 	call PrintText
 	jr .done
@@ -288,6 +291,9 @@ FightingDojoText7:
 	TX_ASM
 	CheckEitherEventSet EVENT_GOT_HITMONLEE, EVENT_GOT_HITMONCHAN
 	jr z, .GetMon
+	;mc give other hitmon if player beat sabrina
+	CheckEvent EVENT_BEAT_SABRINA
+	jr nz, .GetMon
 	ld hl, OtherHitmonText
 	call PrintText
 	jr .done

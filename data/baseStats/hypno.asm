@@ -12,11 +12,11 @@ INCBIN HYPNO_FR,0,1 ; 77, sprite dimensions
 dw HypnoPicFront
 dw HypnoPicBack
 ; attacks known at lvl 0
-db POUND
-db HYPNOSIS
-db DISABLE
-db CONFUSION
-db 0 ; growth rate
+db 0
+db 0
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 1,5,6,8
 	tmlearn 9,10,15

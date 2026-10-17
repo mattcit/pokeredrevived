@@ -12,7 +12,7 @@ INCBIN MAGIKARP_FR,0,1 ; 66, sprite dimensions
 dw MagikarpPicFront
 dw MagikarpPicBack
 ; attacks known at lvl 0
-db SPLASH
+db 0
 db 0
 db 0
 db 0

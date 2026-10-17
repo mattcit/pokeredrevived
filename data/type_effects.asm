@@ -7,6 +7,8 @@ TypeEffects:
 	db WATER,FIRE,20
 	db FIRE,GRASS,20
 	db FIRE,ICE,20
+;claude: BAL-10 -- Gen-2 revision: Ice is not very effective against Fire (was neutral in Gen 1)
+	db ICE,FIRE,05
 	db GRASS,WATER,20
 	db ELECTRIC,WATER,20
 	db WATER,ROCK,20

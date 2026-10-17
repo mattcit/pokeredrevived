@@ -1,37 +1,8 @@
-_TM35PreReceiveText::
-	text "Tch-tch-tch!"
-	line "I made a cool TM!"
-
-	para "It can cause all"
-	line "kinds of fun!"
-	prompt
-
-_ReceivedTM35Text::
-	text "<PLAYER> received "
-	line "@"
-	TX_RAM wcf4b
-	text "!@@"
-
-_TM35ExplanationText::
-	text "Tch-tch-tch!"
-	line "That's the sound"
-	cont "of a METRONOME!"
-
-	para "It tweaks your"
-	line "#MON's brain"
-	cont "into using moves"
-	cont "it doesn't know!"
-	done
-
-_TM35NoRoomText::
-	text "Your pack is"
-	line "crammed full!"
-	done
-
+;mc remove metronome text, changed to strong TM mart
 _Lab3Text2::
-	text "EEVEE can evolve"
-	line "into 1 of 3 kinds"
-	cont "of #MON."
+	text "My colleague here"
+	line "sells a number of"
+	cont "very useful TMs!"
 	done
 
 _Lab3Text3::

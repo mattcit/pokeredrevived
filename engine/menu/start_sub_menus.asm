@@ -131,8 +131,9 @@ StartMenu_Pokemon:
 	dw .teleport
 	dw .softboiled
 .fly
-	bit 2, a ; does the player have the Thunder Badge?
-	jp z, .newBadgeRequired
+	;mc TEMPORARILY REMOVE BADGE REQUIREMENT FOR FLY
+	;bit 2, a ; does the player have the Thunder Badge?
+	;jp z, .newBadgeRequired
 	call CheckIfInOutsideMap
 	jr z, .canFly
 	call .checkifforest	;allow flying out of forest maps
@@ -209,6 +210,7 @@ StartMenu_Pokemon:
 	call GBPalWhiteOutWithDelay3
 	jp .goBackToMap
 .teleport
+	; Initial checks for teleport usage (same as Fly)
 	call CheckIfInOutsideMap
 	jr z, .canTeleport
 	call .checkifforest	;allow teleporting out of forest maps
@@ -219,20 +221,47 @@ StartMenu_Pokemon:
 	ld hl, .cannotUseTeleportNowText
 	call PrintText
 	jp .loop
+
 .canTeleport
-	ld hl, .warpToLastPokemonCenterText
-	call PrintText
-	call .reset_safari	;make sure to reset the safari zone
+	; Set Teleport flag (bit 7) before opening the town map so that Slowbro sprite is used.
 	ld hl, wd732
-	set 3, [hl]
-	set 6, [hl]
+	set 7, [hl]			; set Teleport flag (bit 7)
+	call ChooseFlyDestination	; open the town map (Fly destination list)
+	ld a, [wd732]
+	bit 3, a			; check: was a destination confirmed?
+	push af
+	call nz, .reset_safari ;make sure to reset the safari zone
+	pop af
+	jr nz, .destinationConfirmed
+	; If no destination was confirmed (player canceled), clear bit 7 then mimic Fly's cancel flow:
+	ld hl, wd732
+	res 7, [hl]			; clear Teleport flag (bit 7)
+	call LoadFontTilePatterns	; restore font tile patterns
 	ld hl, wd72e
-	set 1, [hl]
-	res 4, [hl]
+	set 1, [hl]			; set wd72e bit 1 (Fly does this too but doesn't appear to have any effect)
+	jp StartMenu_Pokemon		; return to the Pokemon party screen
+
+.destinationConfirmed
+	; -- Mimic Original Teleport Warp Processing --
+	; In the original Teleport move, after destination confirmation the following occurs:
+	; 1. Warp text is printed (we are removing this text now that Teleport doesn't warp to last Pokemon center)
+	; 2. Safari zone is reset.
+	; 3. wd732’s bit 3 and bit 6 are set to indicate a special warp that uses Teleport’s (spin) animation.
+	; 4. In wd72e, bit 1 is set and bit 4 is cleared to prevent wild battles.
+	; 5. A 60-frame delay occurs.
+	; 6. A fade-out routine is called.
+	; 7. Then warp processing is started.
+	;ld hl, wd732
+	;set 3, [hl]			; set bit 3 to mark warp HANDLED BY LoadTownMap_Fly
+	;set 6, [hl]			; set bit 6 so that warp routines use Teleport’s spin animation
+	ld hl, wd72e
+	set 1, [hl]			; set bit 1 (as original Teleport did; even if not used, replicate behavior)
+	;res 4, [hl]			; reset bit 4 which handles disabling battles ALREADY HANDLED BY ChooseFlyDestination 
 	ld c, 60
-	call DelayFrames
-	call GBPalWhiteOutWithDelay3
-	jp .goBackToMap
+	call DelayFrames		; delay 60 frames
+	call GBPalWhiteOutWithDelay3	; perform fade-out transition
+	jp .goBackToMap			; jump to warp processing
+
 .warpToLastPokemonCenterText
 	TX_FAR _WarpToLastPokemonCenterText
 	db "@"
@@ -640,6 +669,8 @@ ENDC
 	coord hl, 6, 9
 	ld de, TrainerInfo_BadgesText
 	call PlaceString
+	;mc add star indicator for difficulty level
+	call TrainerInfo_DrawDifficultyStars
 	coord hl, 2, 2
 	ld de, TrainerInfo_NameMoneyTimeText
 	call PlaceString
@@ -736,6 +767,49 @@ TrainerInfo_DrawVerticalLine:
 	dec c
 	jr nz, .loop
 	ret
+
+; Draw "D" + 1–3 stars on BADGES row based on wDifficultyLevel
+; Normal (0) = D★
+; Advanced (1) = D★★
+; Master (2) = D★★★
+TrainerInfo_DrawDifficultyStars:
+    ; starCount = wDifficultyLevel + 1  (1..3)
+    ld a, [wDifficultyLevel]
+    inc a
+    ld b, a                 ; B = starCount (1..3)
+
+    ; We'll use columns 16–19 on row 9:
+    ; 16 = "D"
+    ; 17–19 = up to 3 stars
+    coord hl, 16, 9
+
+    ; Clear 4 tiles first (so redraw is clean)
+    ld a, " "
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hl], a
+
+    ; Move HL back to start
+    coord hl, 16, 9
+
+    ; Draw the "D"
+    ld a, "D"
+    ld [hli], a
+
+    ; Draw stars
+;claude: AST-2 follow-up: moved the sparkle glyph from font.png tile $69 (which
+;claude: overwrote a vanilla katakana glyph) to the previously-blank tile $41, so the
+;claude: original katakana is left intact and the sparkle sits in genuinely-unused
+;claude: space instead. Raw BG tilemap bytes address vChars1 (font tiles 0-127) via
+;claude: signed addressing as (tile_index + $80), so tile $41 is written as $C1
+;claude: (was $E9 for tile $69).
+    ld a, $C1
+.drawStarsLoop
+    ld [hli], a
+    dec b
+    jr nz, .drawStarsLoop
+    ret
 
 StartMenu_SaveReset:
 	ld a, [wd72e]

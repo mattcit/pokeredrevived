@@ -32,7 +32,7 @@ SuperRodData:
 	dbw SAFARI_ZONE_WEST, FishingGroup6
 	dbw SAFARI_ZONE_CENTER, FishingGroup6
 	dbw UNKNOWN_DUNGEON_2, FishingGroup9
-	dbw UNKNOWN_DUNGEON_3, FishingGroup2
+	dbw UNKNOWN_DUNGEON_3, FishingGroup9
 	dbw UNKNOWN_DUNGEON_1, FishingGroup9
 	db $FF
 

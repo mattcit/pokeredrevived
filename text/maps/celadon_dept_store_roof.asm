@@ -70,12 +70,12 @@ _CeladonMartRoofText_48515::
 
 _ReceivedTM49Text::
 	text "<PLAYER> received"
-	line "TM49!@@"
+	line "TM28!@@"
 
 _CeladonMartRoofText_48520::
 	db $0
-	para "TM49 contains"
-	line "TRI ATTACK!@@"
+	para "TM28 contains"
+	line "DIG!@@"
 
 _CeladonMartRoofText_48526::
 	text "You don't have"

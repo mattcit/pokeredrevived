@@ -12,8 +12,8 @@ INCBIN LICKITUNG_FR,0,1 ; 77, sprite dimensions
 dw LickitungPicFront
 dw LickitungPicBack
 ; attacks known at lvl 0
-db WRAP
-db SUPERSONIC
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 9,10,11,12,13,14,15
 	tmlearn 17,18,19,20,24
 	tmlearn 25,26,27,31,32
-	tmlearn 34,38,40
+	tmlearn 34,35,38,40
 	tmlearn 44
 	tmlearn 50,51,53,54
 ;	db 0 ; padding

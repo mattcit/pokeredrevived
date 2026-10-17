@@ -164,7 +164,7 @@ SafariZoneEntranceTextPointers:
 	jp nz, .PleaseComeAgain
 	xor a
 	ld [hMoney], a
-	ld a, $05
+	ld a, $50
 	ld [hMoney + 1], a
 	ld a, $00
 	ld [hMoney + 2], a
@@ -177,7 +177,7 @@ SafariZoneEntranceTextPointers:
 .success
 	xor a
 	ld [wPriceTemp], a
-	ld a, $05
+	ld a, $50
 	ld [wPriceTemp + 1], a
 	ld a, $00
 	ld [wPriceTemp + 2], a

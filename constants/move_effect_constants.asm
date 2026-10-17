@@ -77,8 +77,8 @@ const_value = 0
 	const SPEED_DOWN_SIDE_EFFECT     ; $46
 	const SPECIAL_DOWN_SIDE_EFFECT   ; $47
 	const ACCURACY_DOWN_SIDE_EFFECT  ; $48
-	const UNUSED_EFFECT_49           ; $49
-	const UNUSED_EFFECT_4A           ; $4A
+	const ROAR_EFFECT                ; $49 Roar (was unused)
+	const WHIRLWIND_EFFECT           ; $4A Whirlwind (was unused)
 	const UNUSED_EFFECT_4B           ; $4B
 	const CONFUSION_SIDE_EFFECT      ; $4C
 	const TWINEEDLE_EFFECT           ; $4D

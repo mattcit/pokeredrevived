@@ -12,9 +12,9 @@ INCBIN WEEZING_FR,0,1 ; 77, sprite dimensions
 dw WeezingPicFront
 dw WeezingPicBack
 ; attacks known at lvl 0
-db TACKLE
-db SMOG
-db SLUDGE
+db 0
+db 0
+db 0
 db 0
 db 0 ; growth rate
 ; learnset
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 15
 	tmlearn 20,24
 	tmlearn 25,31,32
-	tmlearn 34,36,38
+	tmlearn 34,35,36,38
 	tmlearn 44,47
 	tmlearn 50
 ;	db 0 ; padding

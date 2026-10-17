@@ -12,13 +12,13 @@ INCBIN MOLTRES_FR,0,1 ; 77, sprite dimensions
 dw MoltresPicFront
 dw MoltresPicBack
 ; attacks known at lvl 0
-db PECK
-db FIRE_SPIN
+db 0
+db 0
 db 0
 db 0
 db 5 ; growth rate
 ; learnset
-	tmlearn 2,4,6
+	tmlearn 2,6
 	tmlearn 9,10,15
 	tmlearn 20
 	tmlearn 31,32

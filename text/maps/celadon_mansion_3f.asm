@@ -41,6 +41,20 @@ _CompletedDexText::
 	cont "Congratulations!"
 	cont "...@@"
 
+_CompletedDexText2::
+	text "As a reward for"
+	line "your hard work"
+	cont "and dedication,"
+	cont "for completing"
+	cont "your #DEX and"
+	cont "becoming the"
+	cont "#MON LEAGUE"
+	cont "champion, I'd"
+	cont "like for you to"
+	cont "have a special"
+	cont "#MON as well!"
+	prompt
+
 _CeladonMansion3Text5::
 	text "It's the game"
 	line "program! Messing"

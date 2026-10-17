@@ -12,8 +12,8 @@ INCBIN GRIMER_FR,0,1 ; 55, sprite dimensions
 dw GrimerPicFront
 dw GrimerPicBack
 ; attacks known at lvl 0
-db POUND
-db DISABLE
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 0
 	tmlearn 20,21,24
 	tmlearn 25,31,32
-	tmlearn 34,36,38
+	tmlearn 34,35,36,37,38
 	tmlearn 44,47
 	tmlearn 50
 ;	db 0 ; padding

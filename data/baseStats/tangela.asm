@@ -12,8 +12,8 @@ INCBIN TANGELA_FR,0,1 ; 66, sprite dimensions
 dw TangelaPicFront
 dw TangelaPicBack
 ; attacks known at lvl 0
-db CONSTRICT
-db BIND
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate

@@ -12,9 +12,9 @@ INCBIN DUGTRIO_FR,0,1 ; 66, sprite dimensions
 dw DugtrioPicFront
 dw DugtrioPicBack
 ; attacks known at lvl 0
-db SCRATCH
-db GROWL
-db DIG
+db 0
+db 0
+db 0
 db 0
 db 0 ; growth rate
 ; learnset
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 9,10,15
 	tmlearn 20
 	tmlearn 26,27,28,31,32
-	tmlearn 34
+	tmlearn 34,37
 	tmlearn 44,48
 	tmlearn 50
 ;	db 0 ; padding

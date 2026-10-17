@@ -165,12 +165,16 @@ MoveNames::
 	db "SUBSTITUTE@"
 	;mc add new moves
 	db "BUG BITE@"
+	db "BUG BUZZ@"
 	db "CROSS CHOP@"
 	db "DRAGONBREATH@"
 	db "ICY WIND@"
+	db "MUD SHOT@"
 	db "MUD SLAP@"
 	db "SHADOW BALL@"
 	db "SPARK@"
 	db "STONE EDGE@"
+	db "X-SCISSOR@"
+	db "FLAME WHEEL@"
 	db "STRUGGLE@"
 

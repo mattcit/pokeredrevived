@@ -12,8 +12,8 @@ INCBIN EXEGGUTOR_FR,0,1 ; 77, sprite dimensions
 dw ExeggutorPicFront
 dw ExeggutorPicBack
 ; attacks known at lvl 0
-db BARRAGE
-db HYPNOSIS
+db 0
+db 0
 db 0
 db 0
 db 5 ; growth rate
@@ -22,9 +22,9 @@ db 5 ; growth rate
 	tmlearn 9,10,15
 	tmlearn 20,21,22
 	tmlearn 29,30,31,32
-	tmlearn 33,34,36,37
+	tmlearn 33,34,36
 	tmlearn 44,46,47
-	tmlearn 50,54
+	tmlearn 50,51,54
 ;	db 0 ; padding
 	db BANK(ExeggutorPicFront)
 	assert BANK(ExeggutorPicFront) == BANK(ExeggutorPicBack)

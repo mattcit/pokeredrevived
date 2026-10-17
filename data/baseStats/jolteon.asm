@@ -12,17 +12,17 @@ INCBIN JOLTEON_FR,0,1 ; 66, sprite dimensions
 dw JolteonPicFront
 dw JolteonPicBack
 ; attacks known at lvl 0
-db TACKLE
-db SAND_ATTACK
-db QUICK_ATTACK
-db THUNDERSHOCK
-db 0 ; growth rate
+db 0
+db 0
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 6,8
 	tmlearn 9,10,15
 	tmlearn 20,24
 	tmlearn 25,31,32
-	tmlearn 33,34,39,40
+	tmlearn 33,34,35,37,39,40
 	tmlearn 44,45
 	tmlearn 50,55
 ;	db 0 ; padding

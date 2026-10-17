@@ -28,7 +28,7 @@ DisplayExtraOptionMenu:
 	call PlaceSoundSetting	;joenote - display the sound setting
 	call Show60FPSSetting	;60fps - display current setting
 	call ShowLaglessTextSetting	;joenote - display marker for lagless text or not
-	call ShowHardModeSetting	;joenote - display marker for hard mode or not
+;mc remove shin hard mode from extra menu
 	call ShowNoSwitchSetting	;joenote - display marker for deactivated trainer switching or not
 	call ShowGammaSetting
 	
@@ -60,11 +60,10 @@ DisplayExtraOptionMenu:
 	jr z, .cursorFPS
 	cp $3 ; cursor over instant text?
 	jr z, .cursorInstText
-	cp $4 ; cursor over hard mode?
-	jr z, .cursorHardMode
-	cp $5 ; cursor over ai switching?
+;mc remove shin hard mode from extra menu
+	cp $4 ; cursor over ai switching?
 	jr z, .cursorAISwitch
-	cp $6 ;cursor over gamma shader?
+	cp $5 ;cursor over gamma shader?
 	jr z, .cursorGamma
 ;	cp $9 ; cursor over lvl cap?
 ;	jr z, .cursorLvlCap
@@ -82,9 +81,7 @@ DisplayExtraOptionMenu:
 	jr .getJoypadStateLoop
 .cursorInstText
 	call ToggleLaglessText
-	jr .getJoypadStateLoop
-.cursorHardMode
-	call ToggleHardMode
+;mc remove shin hard mode from extra menu
 	jr .getJoypadStateLoop
 .cursorAISwitch
 	call ToggleNoSwitch
@@ -114,8 +111,9 @@ DisplayExtraOptionMenu:
 	cp 16
 	ld b, -15
 	jr z, .updateMenuVariables
-	cp 6
-	ld b, 10	;	ld b, 3
+;mc remove shin hard mode from extra menu
+	cp 5
+	ld b, 11	;	ld b, 3
 	jr z, .updateMenuVariables
 ;	cp 10
 ;	ld b, 6
@@ -131,7 +129,8 @@ DisplayExtraOptionMenu:
 ;	ld b, -3
 ;	jr z, .updateMenuVariables
 	cp 16
-	ld b, -10	;ld b, -6
+;mc remove shin hard mode from extra menu
+	ld b, -11	;ld b, -6
 	jr z, .updateMenuVariables
 	;else
 	ld b, -1
@@ -166,18 +165,14 @@ PlaceExtraOptionStrings:
 	ld de, TextInstant
 	call PlaceString
 
-;place hard mode text
-	coord hl, 1, 4
-	ld de, TextHardMode
-	call PlaceString
-
+;mc remove shin hard mode from extra menu
 ;place AI switching text
-	coord hl, 1, 5
+	coord hl, 1, 4
 	ld de, TextAISwitch
 	call PlaceString
 
 ;place gamma shader text
-	coord hl, 1, 6
+	coord hl, 1, 5
 	ld de, TextGamma
 	call PlaceString
 
@@ -306,27 +301,7 @@ ShowLaglessTextSetting:
 	ret
 
 
-;joenote - for hard mode option
-ToggleHardMode:
-	ld a, [wOptions]
-	xor BATTLE_HARD_MODE
-	ld [wOptions], a
-	;fall through
-ShowHardModeSetting:
-	ld hl, OptionMenuOnOffText
-	ld a, [wOptions]
-	bit BIT_BATTLE_HARD, a
-	jr nz, .print
-	inc hl
-	inc hl
-.print
-	ld e, [hl]
-	inc hl
-	ld d, [hl]
-	coord hl, $10, $4
-	call PlaceString
-	ret
-
+;mc remove shin hard mode from extra menu
 
 ;joenote - for deactivating intelligent trainer switching
 ToggleNoSwitch:
@@ -345,7 +320,8 @@ ShowNoSwitchSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $E, $5
+;mc remove shin hard mode from extra menu
+	coord hl, $E, $4
 	call PlaceString
 	ret
 OptionMenuNoSwitch:
@@ -377,7 +353,8 @@ ShowGammaSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $10, $6
+;mc remove shin hard mode from extra menu
+	coord hl, $10, $5
 	call PlaceString
 	ret
 
@@ -452,13 +429,7 @@ ShowGammaSetting:
 ; .next
 	; call ShowBadgeCap
 	; call ShowNoSwitchSetting
-	; ;battle mode SET and HARD
-	; ld hl, wOptions
-	; set BIT_BATTLE_HARD, [hl]
-	; set BIT_BATTLE_SHIFT, [hl]
-	; call ShowHardModeSetting
-	; pop hl
-	; ret
+;mc remove shin hard mode from extra menu
 
 
 TextAudio:
@@ -467,8 +438,7 @@ TextFPS:
 	db " FPS@"
 TextInstant:
 	db " INST. TXT@"
-TextHardMode:
-	db " HARD MODE@"
+;mc remove shin hard mode from extra menu
 TextAISwitch:
 	db " AI SWAPS@"
 TextGamma:

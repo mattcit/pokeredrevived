@@ -12,11 +12,11 @@ INCBIN SHELLDER_FR,0,1 ; 55, sprite dimensions
 dw ShellderPicFront
 dw ShellderPicBack
 ; attacks known at lvl 0
-db TACKLE
-db WITHDRAW
 db 0
 db 0
-db 5 ; growth rate
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 6
 	tmlearn 9,10,11,12,13,14

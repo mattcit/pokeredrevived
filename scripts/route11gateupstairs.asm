@@ -17,9 +17,11 @@ Route11GateUpstairsScriptEnd:
 
 Route11GateUpstairsText2:
 	TX_ASM
+	;mc swap exp all and itemfinder
 	CheckEvent EVENT_GOT_EXP_ALL, 1
 	jr c, .asm_4949b
-	ld a, 30 ; pokemon needed
+	;mc change pokemon required to 20
+	ld a, 20 ; pokemon needed
 	ld [hOaksAideRequirement], a
 	ld a, EXP_ALL ; oak's aide reward
 	ld [hOaksAideRewardItem], a

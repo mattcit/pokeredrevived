@@ -12,8 +12,8 @@ INCBIN ONIX_FR,0,1 ; 77, sprite dimensions
 dw OnixPicFront
 dw OnixPicBack
 ; attacks known at lvl 0
-db TACKLE
-db SCREECH
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate
@@ -22,7 +22,7 @@ db 0 ; growth rate
 	tmlearn 9,10
 	tmlearn 20
 	tmlearn 26,27,28,31,32
-	tmlearn 34,36,40
+	tmlearn 34,36,37,40
 	tmlearn 44,47,48
 	tmlearn 50,54
 ;	db 0 ; padding

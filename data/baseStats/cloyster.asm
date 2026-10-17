@@ -12,11 +12,11 @@ INCBIN CLOYSTER_FR,0,1 ; 77, sprite dimensions
 dw CloysterPicFront
 dw CloysterPicBack
 ; attacks known at lvl 0
-db WITHDRAW
-db SUPERSONIC
-db CLAMP
-db AURORA_BEAM
-db 5 ; growth rate
+db 0
+db 0
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 6
 	tmlearn 9,10,11,12,13,14,15

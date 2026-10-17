@@ -127,43 +127,198 @@ UndoBurnParStats:
 ;joenote - this function puts statexp per enemy pkmn level into de
 ;requires a, b, hl, de, and wCurEnemyLVL
 CalcEnemyStatEXP:
-	ld a, [wOptions]	;load game options
-	bit BIT_BATTLE_HARD, a			;check for hard mode
-	jr z, .loadzero		;load zero stat exp if not on hard mode
 	ld a, [wCurEnemyLVL]
 	cp 6
-	jr c, .loadzero	;no stat exp for levels 5 or lower
-	cp 100	;make it so lvl maxes out at lvl 100
-	jr c, .next
+	jp c, .loadzero	; no stat exp for levels 5 or lower
+	cp 100
+	jr c, .level_ok
 	ld a, 100
-.next
+.level_ok
 
-	ld b, a
-	inc b
-	ld a, 6
+	; --------------------------------------------
+	; New baseline: DE = 5 * (Level^2)
+	; --------------------------------------------
+	; Compute HL = Level * Level
+	ld c, a        ; C = Level (addend)
+	ld b, 0        ; B = 0     (so BC = 00LL)
+
+	ld a, c        ; A = Level (loop counter)
 	ld hl, $0000
+.mul_loop
+	add hl, bc     ; HL += Level
+	dec a
+	jr nz, .mul_loop
+	; HL now = Level^2
 
-.loop
-	ld de, $0000
-	ld e, a	;load level into low nybble of de
-	sla e	;multiply de by 4
-	rl d
-	sla e	
-	rl d
-	add hl, de	;add 12[level] + 50 to hl
-	add hl, de
-	add hl, de
-	ld de, $0032
-	add hl, de
+	; Multiply by 5: HL = HL*4 + HL
+	ld d, h
+	ld e, l            ; DE = HL (save L^2)
 
-	inc a
-	cp b
-	jr nz, .loop
+	add hl, hl         ; HL = 2*L^2
+	add hl, hl         ; HL = 4*L^2
+	add hl, de         ; HL = 5*L^2
 
-.done
+	; Move baseline to DE
 	ld d, h
 	ld e, l
+
+	; ------------------------------------------------------------
+	; Determine if this is a boss trainer battle (sets carry if boss)
+	; ------------------------------------------------------------
+	call IsBossTrainer
+	jr nc, .notBoss
+	ld c, 1
+	jr .haveBossFlag
+.notBoss
+	ld c, 0
+.haveBossFlag
+
+	; ------------------------------------------------------------
+	; Apply difficulty scaling (Normal/Advanced/Master)
+	; using the new 5*L^2 routine as the "moderate baseline"
+	; ------------------------------------------------------------
+	ld a, [wDifficultyLevel]
+	and a
+	jr z, .diffNormal
+	cp DIFF_ADVANCED
+	jr z, .diffAdvanced
+	; otherwise treat as Master
+	jr .diffMaster
+
+.diffNormal
+	; Normal: normal trainers 3/4, bosses 7/8
+	ld a, c
+	and a
+	jr nz, .scale_7_8
+	jr .scale_3_4
+
+.diffAdvanced
+	; Advanced: normal trainers 1.0, bosses 9/8
+	ld a, c
+	and a
+	jr nz, .scale_9_8
+	jp .done
+
+.diffMaster
+	; Master: normal trainers 1.0, bosses 5/4
+	ld a, c
+	and a
+	jr nz, .scale_5_4
+	jp .done
+
+; -------------------
+; Scaling helpers
+; DE = scaled result
+; -------------------
+
+.scale_3_4	; 75%
+	; DE = DE - (DE / 4)
+	ld h, d
+	ld l, e
+	srl h
+	rr l
+	srl h
+	rr l              ; HL = DE/4
+	ld a, e
+	sub l
+	ld e, a
+	ld a, d
+	sbc h
+	ld d, a
+	jr .done
+
+.scale_7_8	; 87.5%
+	; DE = DE - (DE / 8)
+	ld h, d
+	ld l, e
+	srl h
+	rr l
+	srl h
+	rr l
+	srl h
+	rr l              ; HL = DE/8
+	ld a, e
+	sub l
+	ld e, a
+	ld a, d
+	sbc h
+	ld d, a
+	jr .done
+
+.scale_9_8	; 112.5%
+	; DE = DE + (DE / 8)  (clamp to $FFFF on overflow)
+	ld h, d
+	ld l, e
+	srl h
+	rr l
+	srl h
+	rr l
+	srl h
+	rr l              ; HL = DE/8
+	ld a, e
+	add l
+	ld e, a
+	ld a, d
+	adc h
+	ld d, a
+	jr nc, .done
+	ld de, $FFFF
+	jr .done
+
+.scale_5_4	; 125%
+	; DE = DE + (DE / 4)  (clamp to $FFFF on overflow)
+	ld h, d
+	ld l, e
+	srl h
+	rr l
+	srl h
+	rr l              ; HL = DE/4
+	ld a, e
+	add l
+	ld e, a
+	ld a, d
+	adc h
+	ld d, a
+	jr nc, .done
+	ld de, $FFFF
+	jr .done
+
+.scale_3_2	; 150%
+	; DE = DE + (DE / 2)   (clamp to $FFFF on overflow)
+	ld h, d
+	ld l, e
+	srl h
+	rr l              ; HL = DE/2
+
+	ld a, e
+	add l
+	ld e, a
+	ld a, d
+	adc h
+	ld d, a
+	jr nc, .done
+	ld de, $FFFF
+	jr .done
+
+.scale_2_1	; 200%
+	; DE = DE * 2   (clamp to $FFFF on overflow)
+	ld a, e
+	add a
+	ld e, a
+	ld a, d
+	adc a
+	ld d, a
+	jr nc, .done
+	ld de, $FFFF
+	jr .done
+
+.done
+	; testing: set stat exp to set value
+;	ld a, 0
+;	ld d, a
+;	ld e, a
 	ret
+
 .loadzero
 	xor a
 	ld d, a
@@ -523,13 +678,14 @@ GetCriticalHitProbability:
 	ld a, [de]
 	ld e, a
 	
-	ld a, [wLinkState]
-	cp LINK_STATE_BATTLING
-	jr z, .Original
+	;mc skip joe's hard mode stadium crit calculations and just use the original
+	;ld a, [wLinkState]
+	;cp LINK_STATE_BATTLING
+	;jr z, .Original
 	
-	ld a, [wOptions]
-	bit BIT_BATTLE_HARD, a
-	jr nz, .Stadium
+	;ld a, [wOptions]
+	;bit BIT_BATTLE_HARD, a
+	;jr nz, .Stadium
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .Original
@@ -586,9 +742,13 @@ GetCriticalHitProbability:
 	ret
 
 ; high critical hit moves
+;mc add new high crit moves
 HighCriticalMoves:
-	db KARATE_CHOP
 	db RAZOR_LEAF
 	db CRABHAMMER
 	db SLASH
+	db RAZOR_WIND
+	db SKY_ATTACK
+	db STONE_EDGE
+	db CROSS_CHOP
 	db $FF

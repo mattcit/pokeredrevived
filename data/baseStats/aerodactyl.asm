@@ -12,13 +12,13 @@ INCBIN AERODACTYL_FR,0,1 ; 77, sprite dimensions
 dw AerodactylPicFront
 dw AerodactylPicBack
 ; attacks known at lvl 0
-db WING_ATTACK
-db AGILITY
+db 0
+db 0
 db 0
 db 0
 db 5 ; growth rate
 ; learnset
-	tmlearn 2,4,6
+	tmlearn 2,6
 	tmlearn 9,10,15
 	tmlearn 20,23
 	tmlearn 31,32

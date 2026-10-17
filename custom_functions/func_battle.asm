@@ -10,6 +10,14 @@ CheckLowerEnemyPriority:
 	ret
 LowPriorityMoves:
 	cp COUNTER
+	ret z
+;claude: Teleport switches its user out in trainer battles, so it goes last there like Counter.
+;claude: In wild battles it just ends the battle, so it keeps normal priority. Z set = low
+;claude: priority, so Teleport only returns Z when wIsInBattle == 2 (trainer battle).
+	cp TELEPORT
+	ret nz
+	ld a, [wIsInBattle]
+	cp 2
 ;	ret z
 ;	cp DUMMY_MOVE1
 ;	ret z
@@ -30,6 +38,11 @@ CheckHigherEnemyPriority:
 	ret
 HighPriorityMoves:
 	cp QUICK_ATTACK
+	ret z
+;claude: Roar and Whirlwind usually go first, in every kind of battle
+	cp ROAR
+	ret z
+	cp WHIRLWIND
 ;	ret z
 ;	cp DUMMY_MOVE1
 ;	ret z
@@ -585,7 +598,7 @@ TypePalColorList:
 	db PAL_GREYMON;rock
 	db PAL_BW;untyped/bird
 	db PAL_GREENMON;bug
-	db PAL_PURPLEMON;ghost
+	db PAL_BW;unused
 	db PAL_BW;unused
 	db PAL_BW;unused
 	db PAL_BW;unused
@@ -604,6 +617,7 @@ TypePalColorList:
 	db PAL_PINKMON;psychic
 	db PAL_CYANMON;ice
 	db PAL_REDMON;dragon
+	db PAL_PURPLEMON;ghost
 ItemPalList:
 	db PAL_BW	;null item
 	db PAL_PURPLEMON	;master ball

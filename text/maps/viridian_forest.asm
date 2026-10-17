@@ -1,11 +1,3 @@
-_ViridianForestText1::
-	text "I came here with"
-	line "some friends!"
-
-	para "They're out for"
-	line "#MON fights!"
-	done
-
 _ViridianForestBattleText1::
 	text "Hey! You have"
 	line "#MON! Come on!"
@@ -62,7 +54,140 @@ _ViridianFrstAfterBattleText3::
 	cont "dropped!"
 	done
 
-_ViridianForestText8::
+_ViridianForestBattleText4::
+	text "Watch out!"
+	line "You'll step on"
+	cont "a CATERPIE!"
+	done
+
+_ViridianForestEndBattleText4::
+	text "I"
+	line "just need more"
+	cont "BUG #MON!"
+	prompt
+
+_ViridianFrstAfterBattleText4::
+	text "You really need"
+	line "to watch where"
+	cont "you step!"
+	done
+
+_ViridianForestBattleText5::
+	text "Check out my"
+	line "cute new #MON!"
+	done
+
+_ViridianForestEndBattleText5::
+	text "No!"
+	line "Leave my new"
+	cont "#MON alone!"
+	prompt
+
+_ViridianFrstAfterBattleText5::
+	text "Maybe I'm not"
+	line "cut out for"
+	cont "being a"
+	cont "#MON trainer!"
+	done
+
+_ViridianForestBattleText6::
+	text "You can be my"
+	line "first opponent!"
+	done
+
+_ViridianForestEndBattleText6::
+	text "Oh,"
+	line "that was tough!"
+	prompt
+
+_ViridianFrstAfterBattleText6::
+	text "If I keep"
+	line "practicing I'll"
+	cont "become a master"
+	cont "one day!"
+	done
+
+_ViridianForestBattleText7::
+	text "I'm taking a"
+	line "hiking break,"
+	cont "but I'll battle!"
+	done
+
+_ViridianForestEndBattleText7::
+	text "I'm"
+	line "winded!"
+	prompt
+
+_ViridianFrstAfterBattleText7::
+	text "I enjoy being"
+	line "out in nature,"
+	cont "but my allergies"
+	cont "disagree!"
+	done
+
+_ViridianForestBattleText8::
+	text "Look!"
+	line "My BUG #MON"
+	cont "just evolved!"
+	done
+
+_ViridianForestEndBattleText8::
+	text "Not"
+	line "strong enough!"
+	prompt
+
+_ViridianFrstAfterBattleText8::
+	text "I can't wait to"
+	line "show my friend,"
+	cont "he'll be so"
+	cont "jealous!"
+	done
+
+_ViridianForestBattleText9::
+	text "My friend took"
+	line "me hiking, but"
+	cont "I'd rather be"
+	cont "at home!"
+	done
+
+_ViridianForestEndBattleText9::
+	text "I"
+	line "was so close!"
+	prompt
+
+_ViridianFrstAfterBattleText9::
+	text "I hope my"
+	line "friend gets tired"
+	cont "so we can leave!"
+	done
+
+_ViridianForestBattleText10::
+	text "Battle me and"
+	line "I'll teach you"
+	cont "the basics!"
+	done
+
+_ViridianForestEndBattleText10::
+	text "Ow!"
+	line "I didn't"
+	cont "expect that!"
+	prompt
+
+_ViridianFrtAfterBattleText10::
+	text "So, the student"
+	line "has become"
+	cont "the master!"
+	done
+
+_ViridianForestText14::
+	text "I came here with"
+	line "some friends!"
+
+	para "They're out for"
+	line "#MON fights!"
+	done
+
+_ViridianForestText15::
 	text "I ran out of #"
 	line "BALLs to catch"
 	cont "#MON with!"
@@ -71,7 +196,7 @@ _ViridianForestText8::
 	line "extras!"
 	done
 
-_ViridianForestText9::
+_ViridianForestText16::
 	text "TRAINER TIPS"
 
 	para "If you want to"
@@ -80,13 +205,13 @@ _ViridianForestText9::
 	cont "grassy areas!"
 	done
 
-_ViridianForestText10::
+_ViridianForestText17::
 	text "For poison, use"
 	line "ANTIDOTE! Get it"
 	cont "at #MON MARTs!"
 	done
 
-_ViridianForestText11::
+_ViridianForestText18::
 	text "TRAINER TIPS"
 
 	para "Contact PROF.OAK"
@@ -95,7 +220,7 @@ _ViridianForestText11::
 	cont "evaluated!"
 	done
 
-_ViridianForestText12::
+_ViridianForestText19::
 	text "TRAINER TIPS"
 
 	para "No stealing of"
@@ -105,7 +230,7 @@ _ViridianForestText12::
 	cont "#MON!"
 	done
 
-_ViridianForestText13::
+_ViridianForestText20::
 	text "TRAINER TIPS"
 
 	para "Weaken #MON"
@@ -116,7 +241,7 @@ _ViridianForestText13::
 	line "they may escape!"
 	done
 
-_ViridianForestText14::
+_ViridianForestText21::
 	text "LEAVING"
 	line "VIRIDIAN FOREST"
 	cont "PEWTER CITY AHEAD"

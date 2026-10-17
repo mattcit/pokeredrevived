@@ -465,8 +465,16 @@ LearnMoveFromLevelUp:
 	ld [wd11e], a
 	ret
 
-; writes the moves a mon has at level [wCurEnemyLVL] to [de]
-; move slots are being filled up sequentially and shifted if all slots are full
+;mc change WriteMonMoves routine to replace duplicate moves instead of skipping them
+; Note: the new duplicate logic assumes the known moves list always has 4 unique
+; moves by the time it encounters a duplicate move.
+;
+; If a learnset has a duplicate within the first 4 moves, it will add a blank slot 
+; in the known moves list which will then cause the routine to stop adding moves
+; prematurely.
+;
+; This shouldn't be a problem with any actual learnsets though, just a nuance that
+; was discovered during testing.
 WriteMonMoves:
 	call GetPredefRegisters
 	push hl
@@ -474,7 +482,7 @@ WriteMonMoves:
 	push bc
 	ld hl, EvosMovesPointerTable
 	ld b, 0
-	ld a, [wcf91]  ; cur mon ID
+	ld a, [wcf91]	; cur mon ID
 	dec a
 	add a
 	rl b
@@ -488,84 +496,189 @@ WriteMonMoves:
 	and a
 	jr nz, .skipEvoEntriesLoop
 	jr .firstMove
+
 .nextMove
 	pop de
 .nextMove2
 	inc hl
+
 .firstMove
-	ld a, [hli]       ; read level of next move in learnset
+	; HL → level byte of next [level, move] pair
+	ld a, [hli]		; A = level
 	and a
-	jp z, .done       ; end of list
-	ld b, a
+	jp z, .done		; 0 terminator ⇒ end of list
+	ld b, a			; B = move level
 	ld a, [wCurEnemyLVL]
 	cp b
-	jp c, .done       ; mon level < move level (assumption: learnset is sorted by level)
+	jp c, .done		; stop at first move above mon level (learnset is sorted)
+
+	; Day Care minimum level gate
 	ld a, [wLearningMovesFromDayCare]
 	and a
 	jr z, .skipMinLevelCheck
 	ld a, [wDayCareStartLevel]
 	cp b
-	jr nc, .nextMove2 ; min level >= move level
+	jr nc, .nextMove2	; if startLevel >= moveLevel, skip this learn
 
 .skipMinLevelCheck
+	; HL now points to the MOVE ID of this learnset entry.
 
-; check if the move is already known
+	; --- Duplicate check (modified) ---
+	; Save base pointer to current move list in stack copy of DE.
+	; We'll scan the 4 slots, tracking the index in B'.
 	push de
 	ld c, NUM_MOVES
+	ld b, 0
 .alreadyKnowsCheckLoop
-	ld a, [de]
+	ld a, [de]		; read slot value
 	inc de
-	cp [hl]
-	jr z, .nextMove
+	cp [hl]			; is this the same move?
+	jr z, .handleDuplicate	; new rule: remove old, append new
+	inc b			; next index
 	dec c
 	jr nz, .alreadyKnowsCheckLoop
 
-; try to find an empty move slot
+	; --- No duplicate found: original behavior ---
+	; try to find first empty slot
 	pop de
 	push de
 	ld c, NUM_MOVES
 .findEmptySlotLoop
 	ld a, [de]
 	and a
-	jr z, .writeMoveToSlot2
+	jr z, .writeMoveToSlot2	; write into first empty
 	inc de
 	dec c
 	jr nz, .findEmptySlotLoop
 
-; no empty move slots found
+	; no empty slot: shift all moves one up (delete slot 0), then write last
 	pop de
 	push de
 	push hl
 	ld h, d
 	ld l, e
-	call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
+	call WriteMonMoves_ShiftMoveData	; DE and HL end at last slot
+
 	ld a, [wLearningMovesFromDayCare]
 	and a
 	jr z, .writeMoveToSlot
 
-; shift PP as well if learning moves from day care
-	push de
+	; Day Care: shift PP one up in lock-step with moves
+	push de						; preserve last-slot pointer for the write
+	; Convert last move-slot pointer (base+3) → PP base using the fixed offset
 	ld bc, wPartyMon1PP - (wPartyMon1Moves + 3)
-	add hl, bc
+	add hl, bc					; HL = PP base
 	ld d, h
-	ld e, l
-	call WriteMonMoves_ShiftMoveData ; shift all move PP data one up
-	pop de
+	ld e, l						; DE = PP base
+	call WriteMonMoves_ShiftMoveData	; shift PP (all 3 copies), DE ends at PP+3
+	pop de						; restore last move-slot pointer
 
 .writeMoveToSlot
 	pop hl
 .writeMoveToSlot2
+	; HL = learnset MOVE id pointer, DE = destination slot pointer
 	ld a, [hl]
 	ld [de], a
+
+	; Day Care: write PP for the new move into its PP slot
 	ld a, [wLearningMovesFromDayCare]
 	and a
 	jr z, .nextMove
 
-; write move PP value if learning moves from day care
-	push hl
-	ld a, [hl]
+	push hl					; save learnset move-id pointer
+	ld a, [hl]				; A = move id
 	ld hl, wPartyMon1PP - wPartyMon1Moves
-	add hl, de
+	add hl, de				; HL = PP slot address corresponding to DE
+	push hl					; save PP slot pointer
+	dec a
+	ld hl, Moves
+	ld bc, MoveEnd - Moves
+	call AddNTimes
+	ld de, wBuffer
+	ld a, BANK(Moves)
+	call FarCopyData
+	ld a, [wBuffer + 5]		; PP byte
+	pop hl
+	ld [hl], a				; write PP
+	pop hl
+	jr .nextMove
+
+	; -------------------------------
+	; Duplicate handling (new logic)
+	; -------------------------------
+.handleDuplicate
+	; On entry:
+	;   HL = learnset MOVE id pointer (points at the new move ID)
+	;   DE = base + (dupIndex) + 1  (due to the earlier inc de)
+	;   B  = dupIndex (0..3)
+	;   [stack top] = original base pointer for move list
+	dec de					; DE = address of the duplicate slot (base + dupIndex)
+
+	; Save the learnset pointer so we can read the move id later (and continue).
+	push hl
+
+	; -------- Remove the duplicate by shifting suffix left by 1 --------
+	; Prepare HL, DE to the same duplicate slot; C = (NUM_MOVES - 1 - dupIndex)
+	ld h, d
+	ld l, e					; HL = base + dupIndex
+	ld a, NUM_MOVES - 1
+	sub b
+	ld c, a					; C = count to copy
+	call WriteMonMoves_ShiftMoveData_FromIndex
+	; Now DE = base + 3 (last slot), HL = base + 3 as well.
+
+	; -------- If Day Care, shift PP suffix the same way --------
+	ld a, [wLearningMovesFromDayCare]
+	and a
+	jr z, .dupWriteMove
+
+	; Preserve last-slot pointer for the write that follows
+	push de
+
+	; Compute PP base from (base+3) using fixed offset, then seek to dupIndex
+	ld h, d
+	ld l, e					; HL = base + 3
+	ld bc, wPartyMon1PP - (wPartyMon1Moves + 3)
+	add hl, bc				; HL = PP base
+	ld d, h
+	ld e, l					; DE = PP base
+
+	; Advance HL/DE by dupIndex (B) to align to the PP slot we’re deleting
+	ld a, b
+.ppOffsetLoop
+	and a
+	jr z, .ppDoShift
+	inc hl
+	inc de
+	dec a
+	jr .ppOffsetLoop
+
+.ppDoShift
+	ld a, NUM_MOVES - 1
+	sub b
+	ld c, a					; C = count to copy for PP
+	call WriteMonMoves_ShiftMoveData_FromIndex
+	; DE now = PP + 3
+
+	; Restore last move-slot pointer for the write
+	pop de
+
+.dupWriteMove
+	; Append the new instance at the LAST open slot (always slot 3 after removal,
+	; or slot 3 already empty if list wasn’t full).
+	pop hl					; HL = learnset MOVE id pointer
+	ld a, [hl]
+	ld [de], a				; write move id to last slot
+
+	; Day Care: write PP for the newly-appended move to its PP slot (slot 3)
+	ld a, [wLearningMovesFromDayCare]
+	and a
+	jr z, .dupAdvance
+
+	push hl					; save learnset pointer again
+	ld a, [hl]				; A = move id
+	ld hl, wPartyMon1PP - wPartyMon1Moves
+	add hl, de				; HL = PP slot addr for the last move slot
 	push hl
 	dec a
 	ld hl, Moves
@@ -578,7 +691,12 @@ WriteMonMoves:
 	pop hl
 	ld [hl], a
 	pop hl
-	jr .nextMove
+
+.dupAdvance
+	; Balance the duplicate-scan “push de”, advance HL to next [level, move], continue.
+	pop de					; restore base pointer to move list
+	inc hl					; HL was at MOVE id; step to next level byte
+	jp .firstMove
 
 .done
 	pop bc
@@ -586,15 +704,45 @@ WriteMonMoves:
 	pop hl
 	ret
 
-; shifts all move data one up (freeing 4th move slot)
+
+; ---------------------------------------------------------------------
+; shifts all move data one up (freeing 4th move slot) — original helper
+; On entry: HL = base, DE = base
+; Copies slots [1..3] → [0..2]. On return, DE and HL = base+3.
+; ---------------------------------------------------------------------
 WriteMonMoves_ShiftMoveData:
 	ld c, NUM_MOVES - 1
-.loop
+.shiftAllLoop
 	inc de
 	ld a, [de]
 	ld [hli], a
 	dec c
-	jr nz, .loop
+	jr nz, .shiftAllLoop
+	ret
+
+
+; ---------------------------------------------------------------------
+; shifts a suffix of move/PP data one up, starting at an arbitrary index
+; Inputs:
+;   HL = base + index_to_delete
+;   DE = base + index_to_delete
+;   C  = (NUM_MOVES - 1 - index_to_delete)   ; #items to copy left
+; Effect:
+;   Copies bytes [index+1 .. 3] → [index .. 2].
+;   On return, DE and HL = base + 3 (last slot).
+; Clobbers: A, flags. Preserves: B.
+; ---------------------------------------------------------------------
+WriteMonMoves_ShiftMoveData_FromIndex:
+	; if C == 0 nothing to shift
+	ld a, c
+	and a
+	ret z
+.shiftIdxLoop
+	inc de
+	ld a, [de]
+	ld [hli], a
+	dec c
+	jr nz, .shiftIdxLoop
 	ret
 
 Evolution_FlagAction:

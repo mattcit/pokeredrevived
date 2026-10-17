@@ -73,7 +73,9 @@ RGBASMFLAGS += -E
 endif
 
 # _RED, _BLUE, and _GREEN are the base rom tags. You can only have one of these.
-# _SWBACKS modifies any base rom. It uses spaceworld 48x48 back sprites.
+# _SWBACKS modifies any base rom. It uses spaceworld 48x48 back sprites for Red/Old Man too.
+# _SWMONBACKS modifies any base rom. It uses 48x48 Gen-2-style back sprites for the 151
+# Pokemon species only -- Red's and the Old Man's own back sprites are unaffected.
 
 # You must have one, and only one, of the following tags to set the encounter tables, trades, and game corner prizes:
 # _ENCRED for the data used by japanese and international red version.
@@ -104,7 +106,7 @@ endif
 # Please act responsibly should you choose to compile using this tag.
 # Dev Note: The added flashing can become quite displeasing regardless. Leaving it out makes for a better experience.
 
-$(pokered_obj): 	RGBASMFLAGS += -D _RED -D _ENCRED
+$(pokered_obj): 	RGBASMFLAGS += -D _RED -D _ENCRED -D _SWMONBACKS
 $(pokeblue_obj): 	RGBASMFLAGS += -D _BLUE -D _ENCBLUEGREEN
 $(pokegreen_obj): 	RGBASMFLAGS += -D _GREEN -D _ENCBLUEGREEN -D _RGSPRITES -D _REDGREENJP -D _JPTXT -D _JPLOGO -D _RGTITLE -D _METRIC  
 $(pokebluejp_obj): 	RGBASMFLAGS += -D _BLUE -D _ENCBLUEJP -D _BLUEJP -D _JPTXT -D _JPLOGO -D _METRIC 

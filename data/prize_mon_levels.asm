@@ -5,7 +5,8 @@ IF DEF(_ENCRED)
 	db CLEFAIRY,8
 	db NIDORINA,17
 
-	db DRATINI,18
+	;mc changed dratini to eevee to allow getting all eevee evolutions
+	db EEVEE,15
 	db SCYTHER,25
 	db PORYGON,26
 ELIF DEF(_ENCBLUEJP)

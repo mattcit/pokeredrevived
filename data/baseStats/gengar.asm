@@ -6,15 +6,15 @@ db 110 ; base speed
 db 130 ; base special
 db GHOST ; species type 1
 db POISON ; species type 2
-db 45 ; catch rate
+db 25 ; catch rate
 db 190 ; base exp yield
 INCBIN GENGAR_FR,0,1 ; 66, sprite dimensions
 dw GengarPicFront
 dw GengarPicBack
 ; attacks known at lvl 0
-db LICK
-db CONFUSE_RAY
-db NIGHT_SHADE
+db 0
+db 0
+db 0
 db 0
 db 3 ; growth rate
 ; learnset

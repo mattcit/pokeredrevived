@@ -261,25 +261,42 @@ OverworldLoopLessDelay::
 .noSpinning
 	call UpdateSprites
 
-.moveAhead2		;joenote - rewriting this to implement an optional running or speedup functionality
+;mc add "running" mode when holding B and increase surf and bike speeds
+.moveAhead2        ; running/speed logic
 	ld hl, wFlags_0xcd60
 	res 2, [hl]
-	;ld a, [wWalkBikeSurfState]
-	;dec a ; riding a bike?
-	;jr nz, .normalPlayerSpriteAdvancement
+
+	; do not stack speedups while mid-ledge/fishing
 	ld a, [wd736]
-	bit 6, a ; jumping a ledge?
+	bit 6, a                     ; jumping a ledge?
 	jr nz, .normalPlayerSpriteAdvancement
-	;call DoBikeSpeedup
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	callba TrackRunBikeSpeed
-.speedloop
-	ld a, [wUnusedD119]
-	dec a
-	ld [wUnusedD119], a
+
+	; Check movement state once
+	ld a, [wWalkBikeSurfState]
+	cp $01
+	jr z, .bikeFast
+	cp $02
+	jr z, .surfFast
+
+	; --- WALKING: B-held → ~2× (match surf)
+	ldh a, [hJoyHeld]
+	and B_BUTTON
 	jr z, .normalPlayerSpriteAdvancement
 	call DoBikeSpeedup
-	jr .speedloop
+	jr .normalPlayerSpriteAdvancement
+
+.bikeFast
+	; 3 fast advances + normal below = ~4 steps/frame
+	call DoBikeSpeedup
+	call DoBikeSpeedup
+	call DoBikeSpeedup
+	jr .normalPlayerSpriteAdvancement
+
+.surfFast
+	; SURFING: same as walking+B (~2×)
+	call DoBikeSpeedup
+	; fall through
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .normalPlayerSpriteAdvancement
 	call AdvancePlayerSprite

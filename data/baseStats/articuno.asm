@@ -12,13 +12,13 @@ INCBIN ARTICUNO_FR,0,1 ; 77, sprite dimensions
 dw ArticunoPicFront
 dw ArticunoPicBack
 ; attacks known at lvl 0
-db PECK
-db ICE_BEAM
+db 0
+db 0
 db 0
 db 0
 db 5 ; growth rate
 ; learnset
-	tmlearn 2,4,6
+	tmlearn 2,6
 	tmlearn 9,10,11,12,13,14,15
 	tmlearn 20
 	tmlearn 31,32

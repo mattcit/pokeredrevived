@@ -1,0 +1,47 @@
+GAMEPLAY
+
+Common Gen 1 Bugfixes
+
+Improved Gym Leader, Elite Four and Giovanni/Rival teams
+	Added some counter-type Pokemon to each team to make beating them with a single type harder
+
+Improved EXP ALL to give more EXP and made it available earlier (swapped places with ITEMFINDER)
+
+Added more trainers to Viridian Forest to make early game grinding less annoying
+	Also added new trainers to Route 4 (between Mt Moon and Cerulean City) to help with the level gap before Misty
+		NOTE: Made a slight map change to Route 4 so that after entering Cerulean you can go back to fight the trainers on Route 4, but you still can't go back into Mt Moon
+
+
+POKEMON
+
+All 151 Pokemon are available without trading (all trade evolutions are now level up evolutions)
+
+All wild Pokemon encounters have been adjusted to include more variety
+
+*All Pokemon learnsets have been updated/rebalanced
+
+
+MOVES
+
+Added moves from later gens to fill out and balance out each Type
+	Example: Added Mud Slap and Mud Shot because there were no lower level Ground type moves
+
+Rebalanced HM moves so that they all are valuable in battle
+	Example: Flash now lowers accuracy and causes confusion, Cut is Grass type and can flinch etc
+
+HM moves can be forgotten
+
+Karate Chop is now a Fighting type move
+	Removed High Crit chance to balance it better as a low level Fighting type move
+
+Low Kick has a lower Flinch chance
+	To balance it better as a low level Fighting type move
+
+Razor Wind and Sky Attack are now High Crit chance moves (like in later gens)
+
+Increased Glare accuracy to 90 (like in later gens)
+	Ekans/Arbok deserve a more useful signature move
+
+Dizzy Punch now has Confusion side effect (like in later gens)
+
+Rock Throw accuracy increased to 90 (like in later gens)

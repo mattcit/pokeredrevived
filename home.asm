@@ -4708,7 +4708,33 @@ Random_DV::
 	pop de
 	pop hl
 	ret
-	
+
+IsBossTrainer::
+; Sets carry if the current opponent is a boss trainer, clears carry otherwise.
+	ld a, [wChannelSoundIDs]
+	cp MUSIC_GYM_LEADER_BATTLE
+	jr z, .boss
+	cp MUSIC_FINAL_BATTLE
+	jr z, .boss
+	ld a, [wCurOpponent]
+	cp OPP_SONY2
+	jr z, .boss
+	cp OPP_GIOVANNI
+	jr z, .boss
+	cp OPP_LORELEI
+	jr z, .boss
+	cp OPP_BRUNO
+	jr z, .boss
+	cp OPP_AGATHA
+	jr z, .boss
+	cp OPP_SONY1           ; FOR TESTING: treat as boss
+	jr z, .boss
+	and a              ; clear carry = not a boss
+	ret
+.boss
+	scf                ; set carry = is a boss
+	ret
+
 StatModifierRatios:
 ; first byte is numerator, second byte is denominator
 	db 25, 100  ; 0.25

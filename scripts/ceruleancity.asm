@@ -299,7 +299,7 @@ CeruleanCityText2:
 .asm_4ca20
 	ld hl, CeruleanCityText_196f3
 	call PrintText
-	lb bc, TM_28, 1
+	lb bc, TM_37, 1 ; change from dig to mud slap
 	call GiveItem
 	jr c, .Success
 	ld hl, TM28NoRoomText

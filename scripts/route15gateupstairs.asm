@@ -7,9 +7,11 @@ Route15GateUpstairsTextPointers:
 
 Route15GateUpstairsText1:
 	TX_ASM
+	;mc swap exp all and itemfinder
 	CheckEvent EVENT_GOT_ITEMFINDER
 	jr nz, .asm_49683
-	ld a, 50 ; pokemon needed
+	;mc change pokemon required to 30
+	ld a, 30 ; pokemon needed
 	ld [hOaksAideRequirement], a
 	ld a, ITEMFINDER ; oak's aide reward
 	ld [hOaksAideRewardItem], a

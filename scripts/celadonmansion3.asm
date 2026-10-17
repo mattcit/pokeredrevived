@@ -51,6 +51,18 @@ DirectorText:
 	TX_ASM
 	callab DisplayDiploma
 	SetEvent EVENT_90B	;joenote - set event that diploma has been attained
+	;mc give Mew as a reward for completing the pokedex
+	CheckEvent EVENT_GIVEN_MEW_REWARD
+	jr nz, .noMewReward
+	; check if they have defeated the elite four first before giving Mew
+	CheckEvent EVENT_DEFEATED_ELITE_FOUR
+	jr z, .noMewReward
+	ld hl, MewRewardText
+	call PrintText
+	lb bc, MEW, 40
+	call GivePokemon
+	SetEvent EVENT_GIVEN_MEW_REWARD
+.noMewReward
 	ld a, $1
 	ld [wDoNotWaitForButtonPressAfterDisplayingText], a
 	jp TextScriptEnd
@@ -69,4 +81,8 @@ GameFreakPCText3:
 
 GameFreakSignText:
 	TX_FAR _CeladonMansion3Text8
+	db "@"
+
+MewRewardText:
+	TX_FAR _CompletedDexText2
 	db "@"

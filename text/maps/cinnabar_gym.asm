@@ -156,9 +156,9 @@ _CinnabarGymText_75a3d::
 	done
 
 _CinnabarGymText_75a68::
-	text "I've been to many"
-	line "GYMs, but this is"
-	cont "my favorite!"
+	text "If you beat me, I"
+	line "will give you a"
+	cont "helpful tip!"
 	done
 
 _CinnabarGymText_75a6d::
@@ -167,9 +167,14 @@ _CinnabarGymText_75a6d::
 	prompt
 
 _CinnabarGymText_75a72::
-	text "Us fire #MON"
-	line "fans like PONYTA"
-	cont "and NINETALES!"
+	text "OK, here is the"
+	line "tip as promised:"
+
+	para "If you visit the"
+	line "LAB, there is a"
+	cont "SCIENTIST who"
+	cont "sells powerful"
+	cont "and rare TMs!"
 	done
 
 _CinnabarGymText_75a9d::

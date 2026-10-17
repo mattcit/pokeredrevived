@@ -919,9 +919,6 @@ _ViridianBlackboardPrlzText::
 	text "Paralysis can"
 	line "make #MON"
 	cont "moves misfire!"
-	
-	para "It cuts SPEED"
-	line "by 75 percent."
 
 	para "Paralysis remains"
 	line "after battles."
@@ -2222,6 +2219,17 @@ _MoveWasDisabledText::
 	cont "disabled!"
 	prompt
 
+;claude: LQOL-6 -- specific text for Disable failing because the target already has a
+;claude: disabled move, replacing the generic "But, it failed!" that used to print here
+;claude: (still shared with Disable's own plain miss and its no-PP-anywhere-to-disable
+;claude: case, both left on the generic text -- only this one reason is knowable for
+;claude: certain at its own check point)
+_TargetMoveAlreadyDisabledText::
+	text "<TARGET>'s"
+	line "move is already"
+	cont "disabled!"
+	prompt
+
 _NothingHappenedText::
 	text "Nothing happened!"
 	prompt
@@ -2232,6 +2240,17 @@ _NoEffectText::
 
 _ButItFailedText::
 	text "But, it failed! "
+	prompt
+
+;claude: LQOL-5 -- specific text for when a move's confuse effect can't apply because the
+;claude: target is already confused (Flash/Confuse Ray/Supersonic and, when it applies,
+;claude: Psybeam-family moves' secondary confuse chance), replacing the misleading generic
+;claude: "But, it failed!" that used to print here (wrongly implying the whole move did
+;claude: nothing, even when e.g. Flash's accuracy-lowering half still succeeded)
+_TargetAlreadyConfusedText::
+	text "<TARGET>"
+	line "is already"
+	cont "confused!"
 	prompt
 
 _DidntAffectText::
@@ -3259,3 +3278,18 @@ ENDC
 SECTION "Move Names", ROMX, BANK[MOVE_NAMES]
 
 INCLUDE "text/move_names.asm"
+
+_DifficultyNormalText::
+	text "DIFFICULTY:"
+	line "NORMAL"
+	prompt
+
+_DifficultyAdvancedText::
+	text "DIFFICULTY:"
+	line "ADVANCED"
+	prompt
+
+_DifficultyMasterText::
+	text "DIFFICULTY:"
+	line "MASTER"
+	prompt

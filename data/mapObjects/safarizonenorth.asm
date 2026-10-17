@@ -13,15 +13,17 @@ SafariZoneNorthObject:
 	warp 35, 3, 0, SAFARI_ZONE_REST_HOUSE_4
 
 	db 5 ; signs
-	sign 36, 4, 3 ; SafariZoneNorthText3
-	sign 4, 25, 4 ; SafariZoneNorthText4
-	sign 13, 31, 5 ; SafariZoneNorthText5
-	sign 19, 33, 6 ; SafariZoneNorthText6
-	sign 26, 28, 7 ; SafariZoneNorthText7
+	sign 36, 4, 4 ; SafariZoneNorthText3
+	sign 4, 25, 5 ; SafariZoneNorthText4
+	sign 13, 31, 6 ; SafariZoneNorthText5
+	sign 19, 33, 7 ; SafariZoneNorthText6
+	sign 26, 28, 8 ; SafariZoneNorthText7
 
-	db 2 ; objects
+	db 3 ; objects
 	object SPRITE_BALL, 25, 1, STAY, NONE, 1, PROTEIN
 	object SPRITE_BALL, 19, 7, STAY, NONE, 2, TM_40
+	;mc add gold watch
+	object SPRITE_BALL, 19, 14, STAY, NONE, 3, GOLD_WATCH
 
 	; warp-to
 	warp_to 2, 35, SAFARI_ZONE_NORTH_WIDTH ; SAFARI_ZONE_WEST

@@ -43,6 +43,8 @@ RocketHideout1TextPointers:
 	dw RocketHideout1Text5
 	dw PickUpItemText
 	dw PickUpItemText
+	;mc add helix fossil
+	dw PickUpItemText
 
 RocketHideout1TrainerHeader0:
 	dbEventFlagBit EVENT_BEAT_ROCKET_HIDEOUT_1_TRAINER_0

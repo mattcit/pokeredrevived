@@ -97,10 +97,7 @@ GainExperience:
 	dec a ; is it a trainer battle?
 	jr z, .nottrainerbattle
 	call BoostExp ; if so, boost exp
-;joenote - boost exp again in trainer battles if in hard mode
-;	ld a, [wOptions]
-;	bit BIT_BATTLE_HARD, a
-;	call nz, BoostExp
+;mc removed shin double boost for hard mode
 .nottrainerbattle
 	inc hl
 	inc hl

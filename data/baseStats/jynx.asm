@@ -12,11 +12,11 @@ INCBIN JYNX_FR,0,1 ; 66, sprite dimensions
 dw JynxPicFront
 dw JynxPicBack
 ; attacks known at lvl 0
-db POUND
-db LOVELY_KISS
 db 0
 db 0
-db 0 ; growth rate
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 1,5,6,8
 	tmlearn 9,10,11,12,13,14,15

@@ -56,14 +56,16 @@ _SaffronGymText_5d173::
 
 ReceivedTM46Text::
 	text "<PLAYER> received"
-	line "TM46!@@"
+	line "TM29!@@"
 
 _TM46ExplanationText::
 	db $0
-	para "TM46 is PSYWAVE!"
-	line "It uses powerful"
-	cont "psychic waves to"
-	cont "inflict damage!"
+	para "TM29 is PSYCHIC!"
+	line "Not only is this"
+	cont "move devastating,"
+	cont "it can also lower"
+	cont "the SPECIAL stat"
+	cont "of your enemy!"
 	done
 
 _TM46NoRoomText::

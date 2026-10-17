@@ -12,7 +12,7 @@ INCBIN DITTO_FR,0,1 ; 55, sprite dimensions
 dw DittoPicFront
 dw DittoPicBack
 ; attacks known at lvl 0
-db TRANSFORM
+db 0
 db 0
 db 0
 db 0

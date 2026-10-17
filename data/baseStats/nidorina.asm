@@ -12,9 +12,9 @@ INCBIN NIDORINA_FR,0,1 ; 66, sprite dimensions
 dw NidorinaPicFront
 dw NidorinaPicBack
 ; attacks known at lvl 0
-db GROWL
-db TACKLE
-db SCRATCH
+db 0
+db 0
+db 0
 db 0
 db 3 ; growth rate
 ; learnset
@@ -22,7 +22,7 @@ db 3 ; growth rate
 	tmlearn 9,10,11,12,13,14
 	tmlearn 20,24
 	tmlearn 25,31,32
-	tmlearn 33,34,40
+	tmlearn 33,34,37,40
 	tmlearn 44
 	tmlearn 50
 ;	db 0 ; padding

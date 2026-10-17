@@ -1,4 +1,7 @@
-# Pokémon Red Revived Version
+# Pokémon Choice Red Version
+
+Pokémon: Choice Red Version is a ROM hack that aims to maintain the nostalgia of the original Red Version while improving Pokémon learnsets and availability, adjusting frustrating mechanics, and incorporating bug fixes for a more enjoyable Gen 1 experience.
+
 
 Version 0.0.0
 
@@ -20,43 +23,48 @@ Main Issues:
 -----------
 
 **POKEMON**
-- Early game Pokemon selection is bad
-  - Example: Every time you start a new game, you're either forced to catch and use Pidgeys/Rattatas etc, or to just avoid catching any other Pokemon until later in the game when there are more options
-  - Solution: Add more wild Pokemon variety to early game routes (within reason)
+- Wild Pokemon selection is very repetitive and lacks variety, especially in the early game
+  - Example: Every time you start a new game, you're either forced to catch and use the same boring Pokemon (Pidgey/Rattata etc), or to just avoid catching new Pokemon until later in the game when there are more and better options
+  - Solution: Rebalance all wild pokemon encounters (within reason)
 - You can't complete the Pokedex without trading
   - Solution: Make all 151 Pokemon available without trading (includes changing trade evolutions to level up evolutions)
 
 **MOVES**
-- Many Pokemon have terrible movesets (especially low level Pokemon)
-  - Example: Most low level Pokemon don't even know any STAB moves, making early game battles super boring
+- Many Pokemon have terrible movesets (especially at low levels)
+  - Example: Most low level Pokemon don't even know any STAB moves, making early game battles very boring and repetitive
   - Solution: Update all Pokemon movesets so that every Pokemon starts with a low level STAB move, and will always learn better STAB moves as they level up
-- Moves are not balanced between Types
+- The availability of Moves for each Type is not balanced
   - Example: There are no low level Ground type moves, and no high level Bug type moves
-  - Solution: Add in moves from other generations to balance out each type--also adjust some original moves for balancing
-- Some moves are too powerful early game (especially for Nuzlocke runs)
+  - Solution: Add in moves from other generations to balance out each type, and also adjust some existing moves for improved balancing
+- Some moves are too powerful early game (especially for "challenge" runs like Nuzlocke etc)
   - Example: Moves that do static damage like Sonicboom and Dragon Rage
   - Solution: Make sure no Pokemon can learn those moves too early
-- HM moves aren't balanced, and are generally never used in battle
+- HM moves aren't balanced, and most are generally never used in battle
   - Example: Surf is actually a really good Water type move, but the rest of the HM moves are easily outclassed (or practically useless)
   - Solution: Make all HM moves better/more useful in battle
 
 **DIFFICULTY**
-- Gym leaders/Elite Four aren't much of a challenge
+- Gym leaders/Elite Four are extremely easy to counter
   - Example: Most Gym leaders have single-type teams and can be defeated with a single Pokemon of the opposing type
-  - Solution: Add some variety/counter-type Pokemon to each Gym leader/Elite Four team to make them slightly more difficult (give Brock a Vulpix to counter Grass types etc)
-- Trainers are generally weak and very repetitive
-  - Example: Many trainers have single-type teams, or are just very repetitive with the Pokemon they use
+  - Solution: Add some counter-type Pokemon to each Gym leader/Elite Four teams to make them slightly more difficult (for example, give Brock a Vulpix to counter Grass types etc)
+- Most Trainers have single-type teams and are very repetitive
+  - Example: Many trainers have single-type teams (like Bug Catchers), or are just very repetitive with the Pokemon they use
   - Solution: Make slight changes to all trainers with single-type or repetitive teams
 - Trainer AI is bad/broken
   - Example: Trainers will continually use moves that have no effect, or just make really stupid decisions in general
   - Solution: Use shinpokered's improved trainer AI
 
 **FRUSTRATING MECHANICS**
-- Grinding low level Pokemon is tedious
-  - Example: Exp All gives out barely any experience, making it practically useless
+- Grinding low level Pokemon is tedious--especially at the beginning of the game
+  - Example: There are only 3 trainers (4 including Route 22 Rival) before the first Gym Leader, so you have to grind wild Pokemon early on to level up your team before Brock
+  - Solution: Add some more optional Trainers to Viridian Forest
+  - Example: Exp All would be helpful, but it gives way less experience per Pokemon making it practically useless--Also it's not available very early
   - Solution: Use shinpokered's improved Exp All and make sure the player can access it fairly early in game
-- TMs aren't reusable and HM moves can't be forgotten
-  - Solution: Make TMs reusable and allow HM moves to be forgotten
+- HM moves can't be forgotten
+  - Solution: Allow HM moves to be forgotten
+- Useful TMs are only available once
+  - Example: Thunderbolt and Body Slam are great moves for many Pokemon, but you only get the one TM
+  - Solution: Make strong TMs available for purchase later in the game
 
 
 Minor Issues:

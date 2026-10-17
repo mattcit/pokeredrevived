@@ -12,17 +12,17 @@ INCBIN HITMONLEE_FR,0,1 ; 77, sprite dimensions
 dw HitmonleePicFront
 dw HitmonleePicBack
 ; attacks known at lvl 0
-db DOUBLE_KICK
-db MEDITATE
 db 0
 db 0
-db 0 ; growth rate
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 1,5,6,8
 	tmlearn 9,10
 	tmlearn 17,18,19,20
 	tmlearn 31,32
-	tmlearn 34,35,39,40
+	tmlearn 34,37,39,40
 	tmlearn 44
 	tmlearn 50,54
 ;	db 0 ; padding

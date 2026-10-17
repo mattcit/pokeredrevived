@@ -43,7 +43,8 @@ HallofFameRoomScript2:
 	ld [wHallOfFameRoomCurScript], a
 	; Elite 4 events
 	ResetEventRange ELITE4_EVENTS_START, ELITE4_CHAMPION_EVENTS_END, 1
-	SetEvent EVENT_908	;joenote - unused event. set it for signaling the e4's defeat
+	;mc give event a proper name
+	SetEvent EVENT_DEFEATED_ELITE_FOUR	;joenote - unused event. set it for signaling the e4's defeat
 	xor a
 	ld [wHallOfFameRoomCurScript], a
 	ld a, PALLET_TOWN

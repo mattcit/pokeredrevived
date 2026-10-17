@@ -112,36 +112,26 @@ _OaksLabAroundWorldText::
 	cont "you, <PLAYER>!"
 	done
 
-_OaksLabGivePokeballsText1::
-	text "OAK: You can't get"
-	line "detailed data on"
-	cont "#MON by just"
-	cont "seeing them."
+_OaksLabGivePotionsText1::
+	text "OAK: I've heard"
+	line "you beat <RIVAL>"
+	cont "in a trainer"
+	cont "battle..."
+	cont "Well done!"
 
-	para "You must catch"
-	line "them! Use these"
-	cont "to capture wild"
-	cont "#MON."
+	para "You may find"
+	line "these useful!"
 
 	para "<PLAYER> got 5"
-	line "# BALLs!@@"
+	line "POTIONs!@@"
 
-_OaksLabGivePokeballsText2::
+_OaksLabGivePotionsText2::
 	text ""
-	para "When a wild"
-	line "#MON appears,"
-	cont "it's fair game."
-
-	para "Just throw a #"
-	line "BALL at it and"
-	cont "try to catch it!"
-
-	para "This won't always"
-	line "work, though."
-
-	para "A healthy #MON"
-	line "could escape. You"
-	cont "have to be lucky!"
+	para "You'll need to"
+	line "use many healing"
+	cont "items if you plan"
+	cont "to become the"
+	cont "CHAMPION one day!"
 	done
 
 _OaksLabPleaseVisitText::
@@ -354,6 +344,34 @@ _OaksLabText27::
 	cont "<PLAYER>! Hahaha!"
 	done
 
+_OaksLabText28::
+	text "OAK: <PLAYER>,"
+	line "before you leave"
+	cont "I want to give"
+	cont "you an extra"
+	cont "challenge!"
+
+	para "If you collect 40"
+	line "or more species"
+	cont "of #MON, I've"
+	cont "got a special"
+	cont "gift for you!"
+
+	para "You'll need some"
+	line "# BALLs to"
+	cont "catch any wild"
+	cont "#MON you find!"
+
+	para "<PLAYER> got 5"
+	line "# BALLs!"
+
+	para "Come back and see"
+	line "me when you have"
+	cont "40 different"
+	cont "#MON in your"
+	cont "#DEX!"
+	done
+
 _OaksLabText_1d405::
 	text "I study #MON as"
 	line "PROF.OAK's AIDE."
@@ -389,13 +407,6 @@ _OaksLabText_44206::
 	done
 
 _OaksLabText_4420b::
-	text "You still need"
-	line "more #MON!"
-	cont "Try to catch"
-	cont "other species!"
-	done
-
-_OaksLabText_44210::
 	text "Good, you're"
 	line "trying hard!"
 	cont "Be sure to get"
@@ -403,18 +414,28 @@ _OaksLabText_44210::
 	cont "AIDE!"
 	done
 
-_OaksLabText_44215::
-	text "Looking good!"
-	line "Go find my AIDE"
-	cont "when you get 50!"
-	done
-
-_OaksLabText_4421a::
-	text "You finally got at"
-	line "least 50 species!"
+_OaksLabText_44210::
+	text "You already have"
+	line "30 species down!"
 	cont "Get an ITEMFINDER"
 	cont "from my AIDE!"
 	done
+
+_OaksLabText_44215::
+	text "Fantastic!"
+	line "You can use the"
+	cont "AREA function in"
+	cont "the #DEX to"
+	cont "locate more"
+	cont "#MON!"
+	done
+
+_OaksLabText_4421a::
+	text "50 species, that"
+	line "is an amazing"
+	cont "accomplishment!"
+	done
+	
 
 _OaksLabText_4421f::
 	text "Ho! This is geting"
@@ -477,3 +498,38 @@ _OaksLabText_4424c::
 	cont "Congratulations!"
 	done
 
+_OaksLabTextStarterRewardText1::
+	text "I see that"
+	line "you've finally"
+	cont "caught at least"
+	cont "40 #MON!"
+
+	para "As a reward for"
+	line "your great"
+	cont "progress, I'd"
+	cont "like you to have"
+	cont "my last #MON!"
+	prompt
+
+_OaksLabTextStarterRewardText2::
+	text "Now you are one"
+	line "step closer to"
+	cont "completing your"
+	cont "#DEX!"
+
+	para "If I remember"
+	line "correctly, I"
+	cont "believe there is"
+	cont "a man that lives"
+	cont "in FUCHSIA city"
+	cont "who may have"
+	cont "another rare"
+	cont "#MON that you"
+	cont "will need to"
+	cont "complete your"
+	cont "#DEX..."
+
+	para "Anyway, let me"
+	line "go ahead and rate"
+	cont "your #DEX..."
+	prompt

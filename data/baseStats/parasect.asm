@@ -12,13 +12,13 @@ INCBIN PARASECT_FR,0,1 ; 77, sprite dimensions
 dw ParasectPicFront
 dw ParasectPicBack
 ; attacks known at lvl 0
-db SCRATCH
-db STUN_SPORE
-db LEECH_LIFE
 db 0
-db 0 ; growth rate
+db 0
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
-	tmlearn 3,6,8
+	tmlearn 3,4,6,8
 	tmlearn 9,10,15
 	tmlearn 20,21,22
 	tmlearn 28,31,32

@@ -38,6 +38,26 @@ _TM06ExplanationText::
 	para "It is a secret"
 	line "technique over"
 	cont "400 years old!"
+
+	para "Before you leave"
+	line "let me give you"
+	cont "a helpful tip:"
+
+	para "If you SURF out"
+	line "west from FUCHSIA"
+	cont "you will reach"
+	cont "CINNABAR ISLAND."
+
+	para "On that island"
+	line "there's a #MON"
+	cont "researcher who"
+	cont "sells many strong"
+	cont "and rare TMs."
+
+	para "If you're looking"
+	line "to improve your"
+	cont "team, you'll find"
+	cont "TMs very helpful!"
 	done
 
 _TM06NoRoomText::

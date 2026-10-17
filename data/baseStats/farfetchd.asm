@@ -12,13 +12,13 @@ INCBIN FARFETCHD_FR,0,1 ; 66, sprite dimensions
 dw FarfetchdPicFront
 dw FarfetchdPicBack
 ; attacks known at lvl 0
-db SAND_ATTACK
-db PECK
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate
 ; learnset
-	tmlearn 2,3,4,6,8
+	tmlearn 2,3,6,8
 	tmlearn 9,10
 	tmlearn 20
 	tmlearn 31,32

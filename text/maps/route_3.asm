@@ -126,17 +126,25 @@ _Route3AfterBattleText7::
 	done
 
 _Route3BattleText8::
-	text "Eek! Did you"
-	line "touch me?"
+	text "I just heard that"
+	line "JIGGLYPUFF and"
+	cont "CLEFAIRY both"
+	cont "level up slower"
+	cont "after evolving."
 	done
 
 _Route3EndBattleText8::
-	text "That's it?"
+	text "Hm..."
+	line "Maybe I'll use"
+	cont "that MOON STONE?"
 	prompt
 
 _Route3AfterBattleText8::
-	text "ROUTE 4 is at the"
-	line "foot of MT.MOON."
+	text "I think I'll let"
+	line "my JIGGLYPUFF"
+	cont "level up more"
+	cont "before I use a"
+	cont "MOON STONE."
 	done
 
 _Route3Text10::

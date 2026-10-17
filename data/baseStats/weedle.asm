@@ -12,13 +12,13 @@ INCBIN WEEDLE_FR,0,1 ; 55, sprite dimensions
 dw WeedlePicFront
 dw WeedlePicBack
 ; attacks known at lvl 0
-db POISON_STING
-db STRING_SHOT
+db 0
+db 0
 db 0
 db 0
 db 0 ; growth rate
 ; learnset
-	tmlearn 0
+	tmlearn 4
 	tmlearn 0
 	tmlearn 0
 	tmlearn 0

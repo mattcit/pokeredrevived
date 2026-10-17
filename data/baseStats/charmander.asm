@@ -12,8 +12,8 @@ INCBIN CHARMANDER_FR,0,1 ; 55, sprite dimensions
 dw CharmanderPicFront
 dw CharmanderPicBack
 ; attacks known at lvl 0
-db SCRATCH
-db GROWL
+db 0
+db 0
 db 0
 db 0
 db 3 ; growth rate

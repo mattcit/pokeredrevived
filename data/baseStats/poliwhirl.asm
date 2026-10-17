@@ -12,9 +12,9 @@ INCBIN POLIWHIRL_FR,0,1 ; 66, sprite dimensions
 dw PoliwhirlPicFront
 dw PoliwhirlPicBack
 ; attacks known at lvl 0
-db BUBBLE
-db HYPNOSIS
-db WATER_GUN
+db 0
+db 0
+db 0
 db 0
 db 3 ; growth rate
 ; learnset
@@ -22,7 +22,7 @@ db 3 ; growth rate
 	tmlearn 9,10,11,12,13,14
 	tmlearn 17,18,19,20
 	tmlearn 26,27,29,31,32
-	tmlearn 34,35,40
+	tmlearn 34,37,40
 	tmlearn 44,46
 	tmlearn 50,53,54
 ;	db 0 ; padding

@@ -42,13 +42,15 @@ ItemNames:
 	db "DOME FOSSIL@"
 	db "HELIX FOSSIL@"
 	db "SECRET KEY@"
-	db "?????@"
+	;mc added GOLD WATCH for game warden reward
+	db "GOLD WATCH@"
 	db "BIKE VOUCHER@"
 	db "X ACCURACY@"
 	db "LEAF STONE@"
 	db "CARD KEY@"
 	db "NUGGET@"
-	db "PP UP@"	;unused PP_UP
+	;mc added debug "change difficulty" level item
+	db "CHANGE DIFF.@"
 	db "POKé DOLL@"
 	db "FULL HEAL@"
 	db "REVIVE@"
@@ -82,6 +84,7 @@ ItemNames:
 	db "MAX ETHER@"
 	db "ELIXER@"
 	db "MAX ELIXER@"
+	db "DBG STATXP@"
 	db "B2F@"
 	db "B1F@"
 	db "1F@"

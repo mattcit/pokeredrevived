@@ -12,11 +12,11 @@ INCBIN GROWLITHE_FR,0,1 ; 55, sprite dimensions
 dw GrowlithePicFront
 dw GrowlithePicBack
 ; attacks known at lvl 0
-db BITE
-db ROAR
 db 0
 db 0
-db 5 ; growth rate
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 6,8
 	tmlearn 9,10

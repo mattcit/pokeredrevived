@@ -11,7 +11,8 @@ CeladonMansion5Text1:
 
 CeladonMansion5Text2:
 	TX_ASM
-	lb bc, EEVEE, 25
+	;mc change gift eevee level from 25 to 15 for balancing
+	lb bc, EEVEE, 15
 	call GivePokemon
 	jr nc, .asm_24365
 	ld a, HS_CELADON_MANSION_5_GIFT

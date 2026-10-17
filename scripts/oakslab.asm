@@ -1,5 +1,5 @@
 OaksLabScript:
-	CheckEvent EVENT_PALLET_AFTER_GETTING_POKEBALLS_2
+	CheckEvent EVENT_PALLET_AFTER_GETTING_POTIONS_2
 	call nz, OaksLabScript_1d076
 	ld a, $1
 	ld [wAutoTextBoxDrawingControl], a
@@ -128,21 +128,21 @@ OaksLabScript4:
 OaksLabScript5:
 	ld a, $fc
 	ld [wJoyIgnore], a
-	ld a, $11
-	ld [hSpriteIndexOrTextID], a
-	call DisplayTextID
-	call Delay3
-	ld a, $12
-	ld [hSpriteIndexOrTextID], a
-	call DisplayTextID
-	call Delay3
-	ld a, $13
-	ld [hSpriteIndexOrTextID], a
-	call DisplayTextID
-	call Delay3
-	ld a, $14
-	ld [hSpriteIndexOrTextID], a
-	call DisplayTextID
+;	ld a, $11
+;	ld [hSpriteIndexOrTextID], a
+;	call DisplayTextID
+;	call Delay3
+;	ld a, $12
+;	ld [hSpriteIndexOrTextID], a
+;	call DisplayTextID
+;	call Delay3
+;	ld a, $13
+;	ld [hSpriteIndexOrTextID], a
+;	call DisplayTextID
+;	call Delay3
+;	ld a, $14
+;	ld [hSpriteIndexOrTextID], a
+;	call DisplayTextID
 	SetEvent EVENT_OAK_ASKED_TO_CHOOSE_MON
 	xor a
 	ld [wJoyIgnore], a
@@ -652,6 +652,14 @@ OaksLabScript17:
 	ld [wPalletTownCurScript], a
 	xor a
 	ld [wJoyIgnore], a
+	;mc add extra oak text about remaining starter 
+	call EnableAutoTextBoxDrawing
+	ld a, 28
+	ld [hSpriteIndexOrTextID], a
+	call DisplayTextID
+	;mc give player 5 poke balls after receiving pokedex
+	lb bc, POKE_BALL, 5
+	call GiveItem
 
 	ld a, $12
 	ld [wOaksLabCurScript], a
@@ -757,6 +765,7 @@ OaksLabTextPointers:
 	dw OaksLabText25
 	dw OaksLabText26
 	dw OaksLabText27
+	dw OaksLabText28
 
 OaksLabTextPointers2:
 	dw OaksLabText1
@@ -976,18 +985,27 @@ OaksLabLastMonText:
 OaksLabText32:
 OaksLabText5:
 	TX_ASM
-	CheckEvent EVENT_PALLET_AFTER_GETTING_POKEBALLS
+	CheckEvent EVENT_PALLET_AFTER_GETTING_POTIONS
 	jr nz, .asm_1d266
-;	ld hl, wPokedexOwned
-;	ld b, wPokedexOwnedEnd - wPokedexOwned
-;	call CountSetBits
-;	ld a, [wNumSetBits]
-;	cp 2
-;	jp c, .asm_1d279
-;joenote - check an event instead of checking the pokedex
-	CheckEvent EVENT_01B
-	jp nz, .asm_1d279
-	
+;mc change route 22 rival/poke ball gift:
+; - bypass check for number of pokemon owned
+; - remove check for poke balls in bag
+; - change poke ball gift to potions
+	; if they’ve beaten the Route 22 rival **and** not yet got Oak’s gift, go straight to the gift branch
+	CheckEvent EVENT_BEAT_ROUTE22_RIVAL_1ST_BATTLE
+	jr   z, .continueChecks	; if *not* beaten, fall through to the normal checks
+	CheckEvent EVENT_GOT_POTIONS_FROM_OAK
+	jr   nz, .continueChecks	; if gift already given, also fall through
+	jp   .asm_1d279				; otherwise, jump into the *start* of the gift branch
+
+.continueChecks:
+	ld hl, wPokedexOwned
+	ld b, wPokedexOwnedEnd - wPokedexOwned
+	call CountSetBits
+	ld a, [wNumSetBits]
+	cp 2
+	jp c, .asm_1d279
+
 	CheckEvent EVENT_GOT_POKEDEX
 	jr z, .asm_1d279
 .asm_1d266
@@ -998,9 +1016,7 @@ OaksLabText5:
 	predef DisplayDexRating
 	jp .asm_1d2ed
 .asm_1d279
-	ld b, POKE_BALL
-	call IsItemInBag
-	jr nz, .asm_1d2e7
+	;mc removed check for poke balls in bag
 	CheckEvent EVENT_BEAT_ROUTE22_RIVAL_1ST_BATTLE
 	jr nz, .asm_1d2d0
 	CheckEvent EVENT_GOT_POKEDEX
@@ -1036,16 +1052,13 @@ OaksLabText5:
 	call PrintText
 	jr .asm_1d2ed
 .asm_1d2d0
-	CheckAndSetEvent EVENT_GOT_POKEBALLS_FROM_OAK
+	CheckAndSetEvent EVENT_GOT_POTIONS_FROM_OAK
 	jr nz, .asm_1d2e7
-	lb bc, POKE_BALL, 5
-	;joenote - check to see if beaten on hard mode and give a different gift if true
-	CheckEvent EVENT_01C
-	jr z, .next
-	lb bc, GREAT_BALL, 5
-.next
+;mc change poke balls to potions
+	lb bc, POTION, 5
+;mc remove joe's hard mode great ball gift
 	call GiveItem
-	ld hl, OaksLabGivePokeballsText
+	ld hl, OaksLabGivePotionsText
 	call PrintText
 	jr .asm_1d2ed
 .asm_1d2e7
@@ -1076,10 +1089,10 @@ OaksLabAroundWorldText:
 	TX_FAR _OaksLabAroundWorldText
 	db "@"
 
-OaksLabGivePokeballsText:
-	TX_FAR _OaksLabGivePokeballsText1
+OaksLabGivePotionsText:
+	TX_FAR _OaksLabGivePotionsText1
 	TX_SFX_KEY_ITEM
-	TX_FAR _OaksLabGivePokeballsText2
+	TX_FAR _OaksLabGivePotionsText2
 	db "@"
 
 OaksLabPleaseVisitText:
@@ -1241,6 +1254,10 @@ OaksLabText26:
 
 OaksLabText27:
 	TX_FAR _OaksLabText27
+	db "@"
+
+OaksLabText28:
+	TX_FAR _OaksLabText28
 	db "@"
 
 OaksLabText11:

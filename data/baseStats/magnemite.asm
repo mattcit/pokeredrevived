@@ -12,7 +12,7 @@ INCBIN MAGNEMITE_FR,0,1 ; 55, sprite dimensions
 dw MagnemitePicFront
 dw MagnemitePicBack
 ; attacks known at lvl 0
-db TACKLE
+db 0
 db 0
 db 0
 db 0

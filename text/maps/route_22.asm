@@ -26,9 +26,11 @@ _Route22RivalAfterBattleText1::
 	line "out how to get"
 	cont "past them!"
 
-	para "You should quit"
-	line "dawdling and get"
-	cont "a move on!"
+	para "Hey, you better"
+	line "not go and tell"
+	cont "PROF.OAK that you"
+	cont "beat me! It was"
+	cont "beginner's luck!"
 	done
 
 _Route22RivalDefeatedText1::
@@ -39,11 +41,12 @@ _Route22RivalDefeatedText1::
 
 _Route22Text_511bc::
 	text "What?"
-	line "Why do I have 2"
-	cont "#MON?"
+	line "Did you really"
+	cont "think you'd win?"
 
-	para "You should catch"
-	line "some more too!"
+	para "You'll need to"
+	line "train more if you"
+	cont "want to beat me!"
 	prompt
 
 _Route22RivalBeforeBattleText2::

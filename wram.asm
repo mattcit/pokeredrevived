@@ -2436,7 +2436,8 @@ wOptions:: ; d355
 ; 1: earphone 1
 ; 2: earphone 2
 ; 3: earphone 3
-; bit 3: = hard mode
+;mc removed shin hard mode from toggle options
+; bit 3: = unused now
 ; bits 0-2 = text speed (number of frames to delay after printing a letter)
 ; 1: Fast
 ; 3: Medium
@@ -2840,6 +2841,7 @@ wSSAnne9CurScript:: ; d609
 	ds 1
 wRoute22CurScript:: ; d60a
 	ds 1
+wRedsHouse1CurScript:: ;mc added script to reds house 1f for running shoes dialogue
 	ds 1
 wRedsHouse2CurScript:: ; d60c
 	ds 1
@@ -3190,6 +3192,7 @@ wd732:: ; d732
 ; bit 4: jumped into hole (Pokemon Mansion, Seafoam Islands, Victory Road) or went down waterfall (Seafoam Islands), so the target warp is a "dungeon warp"
 ; bit 5: currently being forced to ride bike (cycling road)
 ; bit 6: map destination is [wLastBlackoutMap] (usually the last used pokemon center, but could be the player's house)
+;mc bit 7: used to designate new teleport functionality (works like Fly now)
 	ds 1
 
 wFlags_D733:: ; d733
@@ -3335,6 +3338,11 @@ wDayCareMonOT::   ds NAME_LENGTH ; da54
 
 wDayCareMon:: box_struct wDayCareMon ; da5f
 
+;mc add difficulty level index
+; 0 = Normal, 1 = Advanced, 2 = Master
+wDifficultyLevel:: ; da60
+	ds 1
+
 wMainDataEnd::
 
 
@@ -3366,6 +3374,9 @@ ELSE
 ENDC
 
 wdeed::
+	ds 1
+
+wDbgPrintTemp::	; temp byte for EnemySendOut debug nibble display (do not use for battle flags)
 	ds 1
 
 SECTION "Stack", WRAM0[$df00]

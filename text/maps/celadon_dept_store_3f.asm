@@ -18,10 +18,6 @@ _TM18ExplanationText::
 	line "Not like the one"
 	cont "I'm leaning on,"
 	cont "mind you!"
-	
-	para "It meets NORMAL"
-	line "or FIGHTING moves"
-	cont "with 2x damage!"
 	done
 
 _TM18NoRoomText::

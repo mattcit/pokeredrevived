@@ -59,13 +59,15 @@ ItemUsePtrTable:
 	dw UnusableItem      ; DOME_FOSSIL
 	dw UnusableItem      ; HELIX_FOSSIL
 	dw UnusableItem      ; SECRET_KEY
-	dw UnusableItem		 ; XXX
+	;mc added GOLD WATCH for game warden reward
+	dw UnusableItem		 ; GOLD_WATCH
 	dw UnusableItem      ; BIKE_VOUCHER
 	dw ItemUseXAccuracy  ; X_ACCURACY
 	dw ItemUseEvoStone   ; LEAF_STONE
 	dw ItemUseCardKey    ; CARD_KEY
 	dw UnusableItem      ; NUGGET
-	dw UnusableItem      ; unused PP_UP
+	;mc added debug "change difficulty" level item
+	dw ItemUseChangeDiff ; CHANGE_DIFF
 	dw ItemUsePokedoll   ; POKE_DOLL
 	dw ItemUseMedicine   ; FULL_HEAL
 	dw ItemUseMedicine   ; REVIVE
@@ -99,6 +101,7 @@ ItemUsePtrTable:
 	dw ItemUsePPRestore  ; MAX_ETHER
 	dw ItemUsePPRestore  ; ELIXER
 	dw ItemUsePPRestore  ; MAX_ELIXER
+	dw ItemUseDbgStatXP  ; DBG_STATXP
 
 ItemUseBall:
 
@@ -197,21 +200,9 @@ ItemUseBall:
 	ld a, [hl]
 
 ; The Master Ball always succeeds.
-;joenote - Adding an exception for Mewtwo! This is now the ultimate test of the player's catching skills.
-;		It will play its cry and keep the ball from having any effect.
-;		The ball is not wasted. Mewtwo's mental might prevents you from throwing it.
-;		This added difficulty is only available in hard mode.
+;mc removed joe's hard mode master ball adjustment
 	cp MASTER_BALL
-	jr nz, .not_mball
-	ld a, [wOptions]
-	bit BIT_BATTLE_HARD, a ;check hard mode
 	jp z, .captured	;works as normal outside of hard mode
-	ld a, [wEnemyMon]
-	cp MEWTWO
-	jp nz, .captured ;works as normal if not mewtwo
-	call PlayCry
-	jp ItemUseNoEffect
-.not_mball
 
 ; Anything will do for the basic Poké Ball.
 	cp POKE_BALL
@@ -331,6 +322,18 @@ ItemUseBall:
 
 ; If Rand1 - Status > CatchRate, the ball fails to capture the Pokémon.
 	ld a, [wEnemyMonActualCatchRate]
+; Master difficulty: reduce effective catch rate to ~75% (local only, does not modify wEnemyMonActualCatchRate)
+	ld c, a                     ; c = catch_rate (preserve for reduction)
+	ld a, [wDifficultyLevel]
+	cp DIFF_MASTER
+	ld a, c                     ; restore A = catch_rate (ld does not affect flags)
+	jr nz, .applyCatchRateCheck ; not Master: use unmodified catch_rate
+	srl c
+	srl c                       ; c = catch_rate / 4
+	sub c                       ; a = catch_rate - catch_rate/4 (~75%)
+	jr nz, .applyCatchRateCheck ; non-zero result: use it
+	inc a                       ; clamp to minimum 1 (defensive, catch_rate=0 edge case)
+.applyCatchRateCheck
 	cp b
 	jr c, .failedToCapture
 
@@ -1005,14 +1008,7 @@ ItemUseMedicine:
 	ld a, [wIsInBattle]
 	and a
 	jr z, .compareCurrentHPToMaxHP
-;joenote - at this point, trying to revive a fainted 'mon in battle
-;disallow this in hard mode
-	ld a, [wOptions]
-	bit BIT_BATTLE_HARD, a
-	jr z, .can_revive
-	call ItemUseNotTime
-	jp .done
-.can_revive	
+;mc remove joe's hard mode in battle revive adjustment
 	push hl
 	push de
 	push bc
@@ -1832,20 +1828,9 @@ ItemUseXStat:
 	ld a, [hl]
 	push af ; save [wPlayerMoveEffect]
 	push hl
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - ;double the effect if using hard mode
-	ld a, [wOptions]	;load game options
-	bit BIT_BATTLE_HARD, a			;check battle style (bit set if hard mode)
+;mc remove joe's hard mode x item adjustment
 	ld a, [wcf91]	;load item#
-	jr nz, .double_effect
-	
 	sub X_ATTACK - ATTACK_UP1_EFFECT ;this is the normal 1x effect
-	jr .storeX_ItemEffect
-	
-.double_effect
-	sub X_ATTACK - ATTACK_UP2_EFFECT ;this is the 2x effect
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.storeX_ItemEffect
 	ld [hl], a ; store player move effect
 	call PrintItemUseTextAndRemoveItem
 	ld a, XSTATITEM_ANIM ; X stat item animation ID
@@ -3181,4 +3166,118 @@ CheckMapForMon:
 	dec b
 	jr nz, .loop
 	dec hl
+	ret
+
+;mc added debug "change difficulty" level item
+ItemUseChangeDiff:
+	ld a, [wIsInBattle]
+	and a
+	jp nz, ItemUseNotTime
+
+	; cycle: 0 -> 1 -> 2 -> 0
+	ld a, [wDifficultyLevel]
+	inc a
+	cp 3
+	jr c, .store
+	xor a
+.store
+	ld [wDifficultyLevel], a
+
+	; sync SET mode to match new difficulty
+	ld b, a                     ; preserve difficulty value
+	ld a, [wOptions]
+	ld c, a
+	ld a, b
+	and a                       ; DIFF_NORMAL = 0
+	jr z, .resetToShift
+	set BIT_BATTLE_SHIFT, c     ; Advanced/Master: force SET
+	jr .applyBattleStyle
+.resetToShift
+	res BIT_BATTLE_SHIFT, c     ; Normal: reset to SHIFT
+.applyBattleStyle
+	ld a, c
+	ld [wOptions], a
+
+	; print message
+	ld a, b                     ; restore difficulty for branch checks
+	and a
+	jr z, .normal
+	cp 1
+	jr z, .advanced
+	; else 2
+.master
+	ld hl, DifficultyMasterText
+	jr .print
+.advanced
+	ld hl, DifficultyAdvancedText
+	jr .print
+.normal
+	ld hl, DifficultyNormalText
+.print
+	jp PrintText
+
+DifficultyNormalText:
+	TX_FAR _DifficultyNormalText
+	db "@"
+
+DifficultyAdvancedText:
+	TX_FAR _DifficultyAdvancedText
+	db "@"
+
+DifficultyMasterText:
+	TX_FAR _DifficultyMasterText
+	db "@"
+
+ItemUseDbgStatXP:
+	ld a, [wIsInBattle]
+	and a
+	jp nz, ItemUseNotTime
+
+	ld hl, ShowStatExpText
+	jp PrintText
+
+
+ShowStatExpText:
+	text " "
+	line "@"
+	TX_ASM
+	call ShowStatExp_PrintParty1
+	call WaitForTextScrollButtonPress
+	jp TextScriptEnd
+
+
+; Prints 5x 2-byte Stat EXP values from party mon 1:
+; Line 1: HP  ATK DEF   (0000 0000 0000)
+; Line 2: SPD SPC       (0000 0000)
+ShowStatExp_PrintParty1:
+	; Choose textbox coords that are inside the text box.
+	; These y values assume standard bottom textbox; adjust if your box differs.
+	coord hl, 1, 14          ; line 1
+	ld de, wPartyMon1HPExp
+	call ShowStatExp_PrintWord4
+	call ShowStatExp_Space
+	ld de, wPartyMon1AttackExp
+	call ShowStatExp_PrintWord4
+	call ShowStatExp_Space
+	ld de, wPartyMon1DefenseExp
+	call ShowStatExp_PrintWord4
+
+	coord hl, 1, 15          ; line 2
+	ld de, wPartyMon1SpeedExp
+	call ShowStatExp_PrintWord4
+	call ShowStatExp_Space
+	ld de, wPartyMon1SpecialExp
+	call ShowStatExp_PrintWord4
+	ret
+
+
+; Print 2-byte number at [de] as 4 digits with leading zeroes
+ShowStatExp_PrintWord4:
+	lb bc, LEADING_ZEROES | 2, 4
+	call PrintNumber
+	ret
+
+ShowStatExp_Space:
+	ld a, " "
+	ld [hli], a
 	ret

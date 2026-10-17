@@ -305,7 +305,7 @@ MapHS0D:
 	db ROUTE_2,$01,Show
 	db ROUTE_2,$02,Show
 MapHS0F:
-	db ROUTE_4,$03,Show
+	db ROUTE_4,10,Show
 MapHS14:
 	db ROUTE_9,$0A,Show
 MapHS17:
@@ -407,9 +407,10 @@ MapHS58:
 	db BILLS_HOUSE,$02,Hide
 	db BILLS_HOUSE,$03,Hide
 MapHS33:
-	db VIRIDIAN_FOREST,$05,Show
-	db VIRIDIAN_FOREST,$06,Show
-	db VIRIDIAN_FOREST,$07,Show
+	;mc adjust Viridian Forest items after adding in new trainers
+	db VIRIDIAN_FOREST,11,Show
+	db VIRIDIAN_FOREST,12,Show
+	db VIRIDIAN_FOREST,13,Show
 MapHS3B:
 	db MT_MOON_1,$08,Show
 	db MT_MOON_1,$09,Show
@@ -420,8 +421,8 @@ MapHS3B:
 MapHS3D:
 	db MT_MOON_3,$06,Show
 	db MT_MOON_3,$07,Show
+	;mc removed helix fossil from mt moon, moved to rocket hideout
 	db MT_MOON_3,$08,Show
-	db MT_MOON_3,$09,Show
 MapHS60:
 	db SS_ANNE_2,$02,Hide
 MapHS66:
@@ -440,6 +441,8 @@ MapHSC6:
 MapHSC7:
 	db ROCKET_HIDEOUT_1,$06,Show
 	db ROCKET_HIDEOUT_1,$07,Show
+	;mc added helix fossil to rocket hideout, moved from mt moon
+	db ROCKET_HIDEOUT_1,$08,Show
 MapHSC8:
 	db ROCKET_HIDEOUT_2,$02,Show
 	db ROCKET_HIDEOUT_2,$03,Show
@@ -535,6 +538,8 @@ MapHSD9:
 MapHSDA:
 	db SAFARI_ZONE_NORTH,$01,Show
 	db SAFARI_ZONE_NORTH,$02,Show
+	;mc added gold watch
+	db SAFARI_ZONE_NORTH,$03,Show
 MapHSDB:
 	db SAFARI_ZONE_WEST,$01,Show
 	db SAFARI_ZONE_WEST,$02,Show

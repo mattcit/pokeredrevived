@@ -38,7 +38,7 @@ FuchsiaCityObject:
 	object SPRITE_SLOWBRO, 12, 6, WALK, 2, 7 ; person
 	object SPRITE_SLOWBRO, 30, 12, WALK, 2, 8 ; person
 	object SPRITE_SEEL, 8, 17, WALK, 0, 9 ; person
-	object SPRITE_OMANYTE, 6, 5, STAY, NONE, 10 ; person
+	object SPRITE_SLOWBRO, 6, 5, WALK, 2, 10 ; person
 
 	; warp-to
 	warp_to 5, 13, FUCHSIA_CITY_WIDTH ; FUCHSIA_MART

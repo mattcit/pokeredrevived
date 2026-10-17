@@ -98,22 +98,11 @@ _FuchsiaCityLaprasText::
 	line "of the seas."
 	prompt
 
-_FuchsiaCityOmanyteText::
-	text "Name: OMANYTE"
+_FuchsiaCityLickitungText::
+	text "Name: LICKITUNG"
 
-	para "A #MON that"
-	line "was resurrected"
-	cont "from a fossil."
+	para "It uses it's"
+	line "large tongue like"
+	cont "an arm to grab"
+	cont "food--or attack!"
 	prompt
-
-_FuchsiaCityKabutoText::
-	text "Name: KABUTO"
-
-	para "A #MON that"
-	line "was resurrected"
-	cont "from a fossil."
-	prompt
-
-_FuchsiaCityText_19b2a::
-	text "..."
-	done

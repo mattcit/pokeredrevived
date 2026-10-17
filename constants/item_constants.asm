@@ -45,13 +45,15 @@ SAFARI_ROCK           EQU $16 ; overload
 	const DOME_FOSSIL   ; $29
 	const HELIX_FOSSIL  ; $2A
 	const SECRET_KEY    ; $2B
-	const UNUSED_ITEM   ; $2C "?????"
+	;mc added GOLD WATCH for game warden reward
+	const GOLD_WATCH    ; $2C
 	const BIKE_VOUCHER  ; $2D
 	const X_ACCURACY    ; $2E
 	const LEAF_STONE    ; $2F
 	const CARD_KEY      ; $30
 	const NUGGET        ; $31
-	const PP_UP_2       ; $32	unused pp_up
+	;mc added debug "change difficulty" level item
+	const CHANGE_DIFF   ; $32
 	const POKE_DOLL     ; $33
 	const FULL_HEAL     ; $34
 	const REVIVE        ; $35
@@ -85,6 +87,7 @@ SAFARI_ROCK           EQU $16 ; overload
 	const MAX_ETHER     ; $51
 	const ELIXER        ; $52
 	const MAX_ELIXER    ; $53
+	const DBG_STATXP    ; now $54
 	const FLOOR_B2F     ; $54
 	const FLOOR_B1F     ; $55
 	const FLOOR_1F      ; $56

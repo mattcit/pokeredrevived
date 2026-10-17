@@ -11,7 +11,7 @@ FuchsiaHouse2TextPointers:
 FuchsiaHouse2Text1:
 	TX_ASM
 	CheckEvent EVENT_GOT_HM04
-	jr nz, .subtract
+	jp nz, .subtract
 	ld b, GOLD_TEETH
 	call IsItemInBag
 	jr nz, .asm_3f30f
@@ -27,7 +27,7 @@ FuchsiaHouse2Text1:
 	ld hl, WardenGibberishText2
 .asm_61238
 	call PrintText
-	jr .asm_52039
+	jp .asm_52039
 .asm_3f30f
 	ld hl, WardenTeethText1
 	call PrintText
@@ -44,13 +44,57 @@ FuchsiaHouse2Text1:
 	ld hl, ReceivedHM04Text
 	call PrintText
 	SetEvent EVENT_GOT_HM04
-	jr .asm_52039
+	;mc if player has gold watch, give them the rival's starter
+.goldWatchCheck
+	; check if player has the gold watch in their bag
+	ld b, GOLD_WATCH
+	call IsItemInBag
+	jr z, .HM04ExplanationText ; jump to HM04 explanation/another lost item text if item is not in bag
+	ld hl, WardenWatchThankYouText
+	call PrintText
+	; give player the rival's starter pokemon
+	ld a, [wPlayerStarter] ; figure out the remaining starter pokemon
+	cp STARTER1
+	jr z, .Charmander
+	cp STARTER2
+	jr z, .Squirtle
+	jr .Bulbasaur
+.Charmander ; if player selected Charmander, Squirtle is the rival's starter
+	ld b, SQUIRTLE
+	jr .giveStarterReward
+.Squirtle ; if player selected Squirtle, Bulbasaur is the rival's starter
+	ld b, BULBASAUR
+	jr .giveStarterReward
+.Bulbasaur ; if player selected Bulbasaur, Charmander is the rival's starter
+	ld b, CHARMANDER
+.giveStarterReward
+	; give player the rival's starter pokemon
+	ld c, 15
+	call GivePokemon
+	jr nc, .asm_52039 ; jump to TextScriptEnd if player cant take the pokemon
+	; remove the gold watch if player was able to take the pokemon
+	ld a, GOLD_WATCH
+	ld [$ffdb], a
+	callba RemoveItemByID
+	SetEvent EVENT_GAVE_GOLD_WATCH
+	SetEvent EVENT_GIVEN_RIVAL_STARTER
+	jr .WardenFinalText
 .subtract
+	; check if player has given gold watch yet
+	CheckEvent EVENT_GAVE_GOLD_WATCH
+	jr nz, .WardenFinalText ; jump to warden final text if event is already set
+	jr .goldWatchCheck ; jump to gold watch check if not
+.HM04ExplanationText
 	ld hl, HM04ExplanationText
 	call PrintText
 	jr .asm_52039
 .BagFull
 	ld hl, HM04NoRoomText
+	call PrintText
+.WardenFinalText
+	xor a ; Ensure the game waits for a button press
+	ld [wDoNotWaitForButtonPressAfterDisplayingText], a
+	ld hl, WardenFinalText
 	call PrintText
 .asm_52039
 	jp TextScriptEnd
@@ -90,6 +134,14 @@ HM04ExplanationText:
 
 HM04NoRoomText:
 	TX_FAR _HM04NoRoomText
+	db "@"
+
+WardenWatchThankYouText:
+	TX_FAR _WardenWatchThankYouText
+	db "@"
+
+WardenFinalText:
+	TX_FAR _WardenFinalText
 	db "@"
 
 FuchsiaHouse2Text5:

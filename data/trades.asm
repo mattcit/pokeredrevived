@@ -36,17 +36,18 @@ ELIF DEF(_ENCBLUEGREEN)
 ;	db NIDORAN_M, NIDORAN_F,2,"SPOT@@@@@@@"	;joenote - this was probably accidentally swapped by the localization team
 	db NIDORAN_F, NIDORAN_M,2,"SPOT@@@@@@@"
 
-ELIF DEF(_ENCRED)	;joenote - swap the sexes of the Nidos for red version and alter the beedrill trade
-	db NIDORINA,  NIDORINO, 0,"TERRY@@@@@@"
-	db ABRA,      MR_MIME,  0,"MARCEL@@@@@"
-	db BEEDRILL, BUTTERFREE,2,"PIPPIN@@@@@"
-	db PONYTA,    SEEL,     0,"SAILOR@@@@@"
-	db SPEAROW,   FARFETCHD,2,"DUX@@@@@@@@"
-	db SLOWBRO,   LICKITUNG,0,"MARC@@@@@@@"
-	db POLIWHIRL, JYNX,     1,"LOLA@@@@@@@"
-	db RAICHU,    ELECTRODE,1,"DORIS@@@@@@"
-	db VENONAT,   TANGELA,  2,"CRINKLES@@@"
-	db NIDORAN_M, NIDORAN_F,2,"SPOT@@@@@@@"
+;mc change trades
+ELIF DEF(_ENCRED)
+	db DROWZEE,   PSYDUCK,  0,"ARCHIE@@@@@" ; route 11/vermillion
+	db ABRA,      MR_MIME,  0,"MARCEL@@@@@" ; route 2
+	db BEEDRILL, BUTTERFREE,2,"PIPPIN@@@@@" ; unused
+	db RAPIDASH,  TAUROS,   0,"TORO@@@@@@@" ; cinnabar lab
+	db NIDORAN_M, EXEGGCUTE,2,"PALMER@@@@@" ; vermillion city
+	db KANGASKHAN,LICKITUNG,0,"GUS@@@@@@@@" ; route 18/fuchsia
+	db VOLTORB,   PONYTA,   1,"CINDER@@@@@" ; cerulean city
+	db FARFETCHD, EEVEE,    1,"VIXIE@@@@@@" ; cinnabar lab
+	db POLIWRATH, JYNX,     2,"LUNA@@@@@@@" ; cinnabar lab
+	db CLEFAIRY,  SEEL,     2,"PEARL@@@@@@" ; route 5/cerulean
 
 
 ELSE ;default to use if there is a compiler tag issue

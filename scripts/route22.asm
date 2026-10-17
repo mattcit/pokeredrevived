@@ -55,8 +55,16 @@ Route22RivalMovementData:
 	db $FF
 
 Route22Script0:
+	;mc make sure to hide the rival if the 'rival wants battle' event is reset
+	;	we need to do this because we made it so that the first rival can't be rematched
 	CheckEvent EVENT_ROUTE22_RIVAL_WANTS_BATTLE
-	ret z
+	jr nz, .rivalWantsBattle
+	; hide rival then return as usual
+	ld a, HS_ROUTE_22_RIVAL_1
+	ld [wMissableObjectIndex], a
+	predef HideObject
+	ret
+.rivalWantsBattle
 	ld hl, .Route22RivalBattleCoords
 	call ArePlayerCoordsInArray
 	ret nc
@@ -80,6 +88,9 @@ Route22Script0:
 	db $FF
 
 .firstRivalBattle
+;mc reset the events for triggering the first route 22 rival battle before the fight
+;	so the player can't rematch and potentially see multiple dynamic rival parties
+	ResetEvents EVENT_1ST_ROUTE22_RIVAL_BATTLE, EVENT_ROUTE22_RIVAL_WANTS_BATTLE
 ;joenote - play the rival music here so it begins when the rival appears
 	ld a, [wWalkBikeSurfState]
 	and a
@@ -140,17 +151,58 @@ Route22Script1:
 	call SaveEndBattleTextPointers
 	ld a, OPP_SONY1
 	ld [wCurOpponent], a
-	ld hl, StarterMons_50faf
-	call Route22Script_50ed6
-	ld a, $2
-	ld [wRoute22CurScript], a
+	;mc make the first route 22 rival fight dynamic by having different parties
+	;	based on the how many pokemon are in the player's party
+	;	also, make it so the player can't rematch--otherwise they may notice that
+	;	the rival's team will fluctuate a lot depending on the player's party size
+	;
+	; how to decide which one of OPP_SONY1’s parties to use:
+	;	- For each starter there are 6 different parties the rival can use
+	;		- If the player has one mon, they battle the first party--2 mons, 2nd party etc.
+	;	- The dynamic parties are at the end of OPP_SONY1’s party list, so we need to skip
+	;		the first 9 parties (that's why the "base" offset below is 9)
+	;	- First we figure out the offset based on which starter the rival has
+	;		- The first 6 parties are for STARTER2 (Squirtle), so for STARTER2 there's no offset
+	;		- The next 6 are for STARTER3 so that offset needs to be 6
+	;		- The last 6 are for STARTER1 so that offset needs to be 12
+	;	- Then we add an offset that is the number of pokemon in the players party (1-6)
+	;	- Adding all those together, we get a number between 10-27 which represents on of the
+	;		18 dynamic parties for the first route 22 rival battle
+
+	; 1) store party-size (1–6) in B
+	ld 	a, [wPartyCount]
+	ld 	b, a
+
+	; 2) determine starter-group offset and store in C
+	;	STARTER2 = +0, STARTER3 = +6, STARTER1 = +12
+	ld 	a, [wRivalStarter]
+	cp 	STARTER2
+	jr 	z, .Offset0
+	cp 	STARTER3
+	jr 	z, .Offset6
+	; else it must be STARTER1:
+	ld 	c, 12
+	jr 	.HaveOffset
+ .Offset0:
+	ld 	c, 0
+	jr 	.HaveOffset
+ .Offset6:
+	ld 	c, 6
+ .HaveOffset:
+	; 3) now build your final index: Base(9) + StarterOffset(C) + PartySize(B)
+	ld 	a, 9			; skip the first nine parties for OPP_SONY1
+	add  a, c			; add (0, 6 or 12) for which starter
+	add  a, b			; add number of pokemon in party (1–6)
+
+	ld 	[wTrainerNo], a	; A is now 10–27 and is one of the OPP_SONY1 dynamic parties
+	ld 	a, $2
+	ld 	[wRoute22CurScript], a
 	ret
 
-StarterMons_50faf:
-; starter the rival picked, rival trainer number
-	db STARTER2,$04
-	db STARTER3,$05
-	db STARTER1,$06
+
+
+
+;mc remove the old first rival battle "party -> starter" pointers
 
 Route22Script2:
 	ld a, [wIsInBattle]
@@ -171,18 +223,7 @@ Route22Script2:
 	ld a, $f0
 	ld [wJoyIgnore], a
 	SetEvent EVENT_BEAT_ROUTE22_RIVAL_1ST_BATTLE
-	
-	;joenote - set more event flags to give more information
-	ld a, [wPartyCount]
-	cp 2
-	jr nc, .next1
-	SetEvent EVENT_01B
-	ld a, [wOptions]
-	bit BIT_BATTLE_HARD, a
-	jr z, .next1
-	SetEvent EVENT_01C
-.next1	
-	
+	;mc remove joe's custom events for beating route 22 rival
 	ld a, $1
 	ld [hSpriteIndexOrTextID], a
 	call DisplayTextID

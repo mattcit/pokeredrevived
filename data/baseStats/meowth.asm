@@ -12,17 +12,17 @@ INCBIN MEOWTH_FR,0,1 ; 55, sprite dimensions
 dw MeowthPicFront
 dw MeowthPicBack
 ; attacks known at lvl 0
-db SCRATCH
-db GROWL
 db 0
 db 0
-db 0 ; growth rate
+db 0
+db 0
+db 3 ; growth rate
 ; learnset
 	tmlearn 6,8
 	tmlearn 9,10,11,12,16
 	tmlearn 20,24
 	tmlearn 25,31,32
-	tmlearn 34,39,40
+	tmlearn 34,35,39,40
 	tmlearn 44
 	tmlearn 50
 ;	db 0 ; padding
